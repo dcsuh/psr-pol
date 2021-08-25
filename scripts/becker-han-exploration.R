@@ -7,6 +7,13 @@ library(magrittr)
 library(here)
 
 data <- read_csv(here("data/Becker Han 2020 GEB_gpf & BRT data.csv"))
+#trait data for 4691 avian species
+#competence data for 183 species from meta-analysis 
+#(only used studies with xenodiagnostic testing or larvae from wild birds that tested positive)
+#183 sampled for bbsl competence
+##92 not competent
+##91 competent
+#4508 unsampled for competence
+#study effort approximated using Web of Science citation counts per species
 
-dat1 <- data %>% select(X1,genus,common,inames,bcomp) %>% distinct()
-
+comp_sampled <- data %>% filter(!is.na(.$bcomp))
