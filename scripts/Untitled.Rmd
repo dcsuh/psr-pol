@@ -1,0 +1,17 @@
+---
+title: "life history"
+author: "Daniel Suh"
+date: "1/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message = F}
+library(tidyverse)
+library(magrittr)
+library(plotly)
+```
