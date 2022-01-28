@@ -1,0 +1,94 @@
+---
+title: "exploring CLOVER"
+author: "Daniel Suh"
+date: "11/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+CLOVER is an aggregate database of four different databases: GMPD, HP3, EID2, and Shaw et al.
+https://github.com/viralemergence/clover
+Let's see how it is to work with it.
+
+Packages  
+```{r, message = F}
+library(tidyverse)
+library(magrittr)
+library(plotly)
+```
+
+Read data  
+```{r, message = F}
+mammal <- read_csv("/Users/dcsuh/Desktop/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv")
+columns <- read_csv("/Users/dcsuh/Desktop/clover/CLOVER_ColumnDescriptions.csv")
+```
+
+Check it out  
+```{r}
+mammal_psr <- mammal %>% select(Host, Virus) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
+```
+
+
+```{r}
+gmpd <- read_csv("/Users/dcsuh/Desktop/GMPD_datafiles/GMPD_main.csv")
+```
+
+More data
+```{r, message=F}
+viruses <- read_csv("/Users/dcsuh/Desktop/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv")
+helminths <- read_csv("/Users/dcsuh/Desktop/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv")
+bacteria <- read_csv("/Users/dcsuh/Desktop/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv")
+```
+
+```{r}
+pathogens <- rbind(viruses,bacteria,helminths)
+summary(pathogens)
+#table(pathogens$HostOrder)
+#table(pathogens$PathogenType)
+PSR <- pathogens %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
+path_others <- pathogens %>% filter(PathogenType=="others")
+table(path_others$PathogenClass)
+```
+
+Bigyra is a phylum within the superphylum Heterokonta
+Chromadorea are a class of roundworms (Nematoda)
+Ichthyosporea are a class of eukaryotes that parasitize fish
+Ichthyostracta are a class of crustaceans
+
+Parasite Summary
+```{r}
+ggplot(pathogens, aes(PathogenType)) + geom_bar()
+pathogens %>% filter(PathogenType=="bacteria/rickettsia") %>% ggplot(.,aes(PathogenClass)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.5))
+pathogens %>% filter(PathogenType=="virus") %>% ggplot(.,aes(PathogenClass)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.6))
+```
+
+Host Summary
+```{r}
+ggplot(pathogens, aes(HostClass)) + geom_bar()
+pathogens %>% filter(HostClass=="mammalia") %>% ggplot(.,aes(HostOrder)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
+ggplot(pathogens, aes(Database)) + geom_bar() + plotly()
+
+pathogens %>% group_by(Database) %>% summarize(n=n()) %>% plot_ly(x= ~Database, y = ~n, type="bar") %>% layout(title="# Records by Database")
+```
+
+GMPD Comparison
+```{r}
+clover_gmpd <- pathogens %>% filter(Database=="GMPD2")
+glover_PSR <- clover_gmpd %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
+gmpd_PSR <- gmpd %>% select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% group_by(HostCorrectedName) %>% summarize(psr=n())
+head(glover_PSR)
+head(gmpd_PSR)
+```
+
+Parasite diversity matrix
+Each row is a host
+Each column is a parasite or parasite order
+Counts are host-parasite associations by parasite order
+Using phylogenetic data, an index of diversity can be measured for each host
+```{r}
+
+```
+
