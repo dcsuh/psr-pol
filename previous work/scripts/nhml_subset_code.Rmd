@@ -1,0 +1,47 @@
+---
+title: "helminthR exploration"
+author: "Team parapol (AP coding this bit)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Install useful libraries
+
+```{r libLoad}
+library(tidyverse)
+library(magrittr)
+library(helminthR)
+```
+
+Load Healy data so we know which species we're looking for
+
+```{r}
+healy <- read_csv("data/healy_axis_analysis.csv")
+healy %<>% mutate(species=str_replace_all(species,"_"," "))
+
+```
+
+grab using helminthR
+
+```{r}
+hosts <- healy$species
+h <- plyr::ldply(hosts, function(x)
+    {helminthR::findHost(unlist(strsplit(x, " "))[1], unlist(strsplit(x," "))[2],speciesOnly=T,hostState=1)})
+```
+
+remove parasites not to species
+
+```{r}
+h2 <- h %>% filter(grepl(" ",Parasite)==T) # remove parasite species without spaces, since it means they're only named to genus
+h3 <- h2 %>% filter(grepl("\\.",Parasite)==F) # remove parasite species with ".", since it means "spp." ie. genus only
+h4 <- h3 %>% filter(grepl(" .$",Parasite)==F) # remove parasite species with space-single char-end_of_line, since not to species
+
+h4 %<>% select(Host,Parasite)
+
+h4 %<>% mutate(paraType="helminth")
+write_csv(h4,path="data/nhml_subset.csv")
+```
+

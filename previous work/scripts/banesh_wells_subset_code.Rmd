@@ -1,0 +1,85 @@
+---
+title: "POL Parasite Project"
+author: "David Vasquez"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(stringr)
+library(magrittr)
+library(tidyverse)
+library(dplyr)
+```
+
+#data overlap with Wells et al. 2018
+```{r}
+#wells et al. 2018 data https://datadryad.org/stash/dataset/doi:10.5061/dryad.18j6s77
+
+wells.Data <- read.csv("data/source/wells_full.csv")
+
+healy.Data <- read.csv("data/healy_axis_analysis.csv")
+
+#formatting species data to be the same
+wells.Data$Host.Species <- str_replace_all(wells.Data$Host.Species, "[ ]", "_")
+
+#including only data that has parasite information included
+wells.Data[wells.Data==0] <- NA
+
+wells.Data<-wells.Data[complete.cases(wells.Data),]
+
+#only 17 overlap when only included data that was included in the paper
+hostOverlap <- intersect(wells.Data$Host.Species, healy.Data$species)
+
+#selecting data of interest
+wells.Data <- wells.Data %>% dplyr::select(Host.Species, Host.Order, 
+                            Parasite.Species, Parasite.Taxa)
+
+#adding wells as source
+wells.Data$source <- 'Wells'
+
+hostOverlap <- data.frame(hostOverlap) %>% rename(Host.Species = hostOverlap) 
+
+#joining data so that only wells data that matches healy host species are selected
+hostOverlap <- left_join(hostOverlap,wells.Data)
+
+write.csv(hostOverlap, "data/wells_subset.csv")
+```
+
+
+#data overlap with Banesh et al. 2016 (same code reasoning annotated with wells)
+```{r}
+banesh.Data <- read.csv("data/source/banesh_full.csv") #https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecy.1680#support-information-section
+
+#formatting species data to be the same
+banesh.Data$Host.species <- str_replace_all(banesh.Data$Host.species, "[ ]", "_")
+
+#selecting data for definitive hosts
+banesh.Data <- banesh.Data %>% filter(Def.int=="def")
+
+#looking for overlap between host species of both datasets
+hostOverlap2 = intersect(banesh.Data$Host.species, healy.Data$species)
+
+#creating DF of overlap
+overlapBaneshHealy <- data.frame(hostOverlap2)
+
+banesh.Data <- banesh.Data %>% dplyr::select(Host.species, Host.common.name, 
+                Parasite.species, Parasite.genus, Parasite.group, Typical.host, 
+                Host.no, Site, Host.habitat, Vert.group, Facultative)
+ 
+banesh.Data$source <- 'Banesh'
+
+hostOverlap2 <- data.frame(hostOverlap2) %>% rename(Host.species = hostOverlap2) 
+
+hostOverlap2 <- left_join(hostOverlap2,banesh.Data)
+
+write.csv(hostOverlap2, "data/banesh_subset.csv")
+
+```
+

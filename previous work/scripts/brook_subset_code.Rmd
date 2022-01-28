@@ -1,0 +1,38 @@
+---
+title: "Data from Brook et al."
+author: "Team Parapol (AP coding this)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load useful libraries
+
+```{r libLoad}
+library(tidyverse)
+library(magrittr)
+```
+
+Read in data from Brook et al. and distill it to host & parasite ID (and group) + record source as "brook"
+
+```{r}
+b <- read_csv("data/source/brook_full.csv")
+b %<>% select(hHostNameFinal,hOrder,vVirusNameCorrected)
+b %<>% mutate(paraType="virus",source="brook")
+```
+
+Check overlap with Healy et al. paper
+
+```{r}
+h <- read_csv("data/healy_axis_analysis.csv")
+b %<>% filter(hHostNameFinal %in% h$species)
+```
+
+Write result to a csv file
+
+```{r}
+write_csv(b,path="data/brook_subset.csv")
+```
+
