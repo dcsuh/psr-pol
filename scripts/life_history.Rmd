@@ -13,5 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, message = F}
 library(tidyverse)
 library(magrittr)
-library(plotly)
+library(here)
 ```
+
+```{r, message =F}
+becker_han <- read_csv(here("data/Becker Han 2020 GEB_gpf & BRT data.csv"))
+healy_axis <- read_csv(here("data/healy_axis_analysis.csv"))
+healy_host <- read_csv(here("data/healy_host_par.csv"))
+```
+

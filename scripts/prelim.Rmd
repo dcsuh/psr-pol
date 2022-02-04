@@ -9,4 +9,31 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+library(magrittr)
+library(here)
+```
+
+
+As a first pass, take a look at all hosts included from Healy et al and use PC scores from paper to look at any relationship between parasite species richness or parasite diversity and parasite community against host pace of life
+
+```{r, data, message=F}
+host_axis <- read_csv(here("data/healy_axis_analysis.csv"))
+host_par <- read_csv(here("data/healy_host_par.csv"))
+```
+
+reconcile data
+```{r}
+head(host_axis)
+head(host_par)
+```
+
+Future steps:
+Compile host life history databases
+ - what are the traits that are consistent between databases that will allow for inclusion of more hosts?
+Calculate parasite species richness with proper corrections
+ - correction for parasite relatedness by parasite phylogenetic data
+ - sampling effort
+ - host trait but body size should also be accounted for. or should it? maybe first pass should just treat it like any other host trait and then add correction later if it is a very significant factor
 
