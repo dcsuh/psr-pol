@@ -48,7 +48,7 @@ mock pca - dont trust this. just checking out workflow
 healy_pca <- healy_axis_psr_avg %>% select(-c(mode_of_life,IUCN,met_type,repo_output,met_rate,n,mass_g,mean_repo_rate)) %>% column_to_rownames(.,var="species")
 healy_pca_results <- prcomp(healy_pca)
 pc1_scores <- enframe(healy_pca_results$x[,1], name = "species", value = "pc1")
-tmp <- healy_axis_psr_avg %>% select(species, n)
+tmp <- healy_axis_psr_avg %>% select(species, mean_life_expect, n)
 pc1_scores %<>% left_join(.,tmp, by = "species")
 pc1_scores %>% ggplot(.,aes(x=pc1,y=log10(n))) + geom_point()
 ```
