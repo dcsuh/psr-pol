@@ -1,6 +1,7 @@
 ## Daniel Suh
 ## August 24, 2021
 ## Playing around with data from Becker & Han 2020 GBE
+## https://doi.org/10.1111/geb.13256
 
 library(tidyverse)
 library(magrittr)
