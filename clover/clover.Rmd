@@ -79,6 +79,7 @@ pathogens %>% group_by(Database) %>% summarize(n=n()) %>% plot_ly(x= ~Database, 
 ```
 
 GMPD Comparison
+
 ```{r}
 clover_gmpd <- pathogens %>% filter(Database=="GMPD2")
 glover_PSR <- clover_gmpd %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
@@ -86,6 +87,9 @@ gmpd_PSR <- gmpd %>% select(HostCorrectedName,ParasiteCorrectedName) %>% distinc
 head(glover_PSR)
 head(gmpd_PSR)
 ```
+
+looks like gmpd has more parasites than the clover version of gmpd
+
 
 Parasite diversity matrix
 Each row is a host
@@ -97,9 +101,10 @@ para_by_order <- pathogens %>% select(Host, HostOrder, Pathogen, PathogenOrder) 
 host_sp_para_order_mat <- para_by_order %>% pivot_wider(names_from = PathogenOrder, values_from = n)
 ```
 
+life history datasets
 
-Let's do a prelim analysis with just life history data from Healy
 ```{r}
+healy_axis <- read_csv(here("data/healy_axis_analysis.csv"))
 
 ```
 
