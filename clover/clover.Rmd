@@ -64,15 +64,15 @@ Ichthyostracta are a class of crustaceans
 
 Parasite Summary
 ```{r}
-ggplot(pathogens, aes(PathogenType)) + geom_bar()
-pathogens %>% filter(PathogenType=="bacteria/rickettsia") %>% ggplot(.,aes(PathogenClass)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.5))
-pathogens %>% filter(PathogenType=="virus") %>% ggplot(.,aes(PathogenClass)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.6))
+ggplot(pathogens, aes(PathogenType, fill = Database)) + geom_bar()
+pathogens %>% filter(PathogenType=="bacteria/rickettsia") %>% ggplot(.,aes(PathogenClass, fill = Database)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.5))
+pathogens %>% filter(PathogenType=="virus") %>% ggplot(.,aes(PathogenClass, fill = Database)) +geom_bar()+theme(axis.text.x = element_text(angle=45,vjust=0.6))
 ```
 
 Host Summary
 ```{r}
 ggplot(pathogens, aes(HostClass)) + geom_bar()
-pathogens %>% filter(HostClass=="mammalia") %>% ggplot(.,aes(HostOrder)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
+pathogens %>% filter(HostClass=="mammalia") %>% ggplot(.,aes(HostOrder,fill = Database)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
 ggplot(pathogens, aes(Database)) + geom_bar() + plotly()
 
 pathogens %>% group_by(Database) %>% summarize(n=n()) %>% plot_ly(x= ~Database, y = ~n, type="bar") %>% layout(title="# Records by Database")

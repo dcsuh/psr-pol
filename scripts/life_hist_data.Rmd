@@ -26,7 +26,31 @@ elton <- read_tsv(here("data/eltontraits/MamFuncDat.txt"))
 ```
 
 ```{r}
+summary(amniote)
+```
+
+```{r}
+summary(elton)
+```
+
+```{r}
+summary(hormone)
+```
+
+```{r}
+summary(panth1)
+```
+
+```{r}
+summary(panth2)
+```
+
+Compare pantheria
+```{r}
+spec_panth1 <- panth1 %>% dplyr::select(1:5) %>% distinct()
+spec_panth2 <- panth2 %>% dplyr::select(1:5) %>% distinct()
 
 ```
+
 
 
