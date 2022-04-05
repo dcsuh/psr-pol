@@ -1,0 +1,32 @@
+---
+title: "life history"
+author: "Daniel Suh"
+date: "1/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message = F}
+library(tidyverse)
+library(magrittr)
+library(plotly)
+library(here)
+```
+
+```{r, message = F}
+amniote <- read_csv(here("data/amniote/ECOL_96_269/Data_Files/Amniote_Database_Aug_2015.csv"))
+hormone <- read_csv(here("data/hormonebase/HormoneBase_v1.csv"))
+panth1 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
+panth2 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR93_Aug2008.txt"))
+elton <- read_tsv(here("data/eltontraits/MamFuncDat.txt"))
+```
+
+```{r}
+
+```
+
+
