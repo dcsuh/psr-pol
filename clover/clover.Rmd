@@ -71,7 +71,7 @@ pathogens %>% filter(PathogenType=="virus") %>% ggplot(.,aes(PathogenClass, fill
 
 Host Summary
 ```{r}
-ggplot(pathogens, aes(HostClass)) + geom_bar()
+ggplot(pathogens, aes(HostClass, fill = Database)) + geom_bar()
 pathogens %>% filter(HostClass=="mammalia") %>% ggplot(.,aes(HostOrder,fill = Database)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
 ggplot(pathogens, aes(Database)) + geom_bar() + plotly()
 
