@@ -140,4 +140,9 @@ mean((yhat_boost-boost_gmpd$data$y)^2)
 sqrt(mean((yhat_boost-boost_gmpd$data$y)^2))
 ```
 
+things to do:
 
+ - turn references column into reference count
+ - go through each variable and choose just the most important ones
+ - see if Healy dataset makes more sense
+ - subset analysis by host or parasite type
