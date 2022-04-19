@@ -40,15 +40,15 @@ healy_axis_psr_avg$mode_of_life <- factor(healy_axis_psr_avg$mode_of_life)
 healy_axis_psr_avg$IUCN <- factor(healy_axis_psr_avg$IUCN)
 healy_axis_psr_avg$met_type <- factor(healy_axis_psr_avg$met_type)
 
-healy_axis_psr_avg %<>% select(-c(taxa_name,animal,host))
+healy_axis_psr_avg %<>% dplyr::select(-c(taxa_name,animal,host))
 ```
 
 mock pca - dont trust this. just checking out workflow
 ```{r}
-healy_pca <- healy_axis_psr_avg %>% select(-c(mode_of_life,IUCN,met_type,repo_output,met_rate,n,mass_g,mean_repo_rate)) %>% column_to_rownames(.,var="species")
+healy_pca <- healy_axis_psr_avg %>% dplyr::select(-c(mode_of_life,IUCN,met_type,repo_output,met_rate,n,mass_g,mean_repo_rate)) %>% column_to_rownames(.,var="species")
 healy_pca_results <- prcomp(healy_pca)
 pc1_scores <- enframe(healy_pca_results$x[,1], name = "species", value = "pc1")
-tmp <- healy_axis_psr_avg %>% select(species, mean_life_expect, n)
+tmp <- healy_axis_psr_avg %>% dplyr::select(species, mean_life_expect, n)
 pc1_scores %<>% left_join(.,tmp, by = "species")
 pc1_scores %>% ggplot(.,aes(x=pc1,y=log10(n))) + geom_point()
 ```
@@ -101,8 +101,11 @@ ggplot(gmpd_panth, aes(x=psr)) + geom_histogram(binwidth = 1)
 
 library(reshape2)
 gmpd_panth2 <- gmpd_panth %>% melt(., id.vars = "psr")
-gmpd_panth2 %>% ggplot(.,aes(x=value,y=psr)) + geom_smooth(method="lm") + facet_wrap(~variable, scales = "free_x")
+gmpd_panth2 %>% ggplot(.,aes(x=value,y=psr)) + geom_point() + geom_smooth(method="lm") + facet_wrap(~variable, scales = "free_x")
 ```
+
+
+Multiple linear regression surely won't work but why not GAMs??
 
 
 
@@ -162,3 +165,32 @@ things to do:
  - go through each variable and choose just the most important ones
  - see if Healy dataset makes more sense
  - subset analysis by host or parasite type
+ - do this with healy data instead for life history data
+
+```{r}
+ggplot(healy_axis_psr, aes(x=n)) + geom_histogram(binwidth = 5)
+
+healy_psr_2 <- healy_axis_psr %>% melt(., id.vars = "n")
+healy_psr_2 %>% ggplot(.,aes(x=value,y=n)) + geom_point() + geom_smooth(method="lm") + facet_wrap(~variable, scales = "free_x")
+```
+
+
+
+```{r}
+healy_axis_psr %<>% dplyr::select(-c(animal, host, species, taxa_name)) 
+healy_axis_psr$mode_of_life <- as.factor(healy_axis_psr$mode_of_life)
+healy_axis_psr$IUCN <- as.factor(healy_axis_psr$IUCN)
+healy_axis_psr$met_type <- as.factor(healy_axis_psr$met_type)
+healy_axis_psr %<>% filter(!is.na(n))
+train <- sample(1:nrow(healy_axis_psr), nrow(healy_axis_psr) / 2)
+boost_healy <- gbm(n~., data = healy_axis_psr[train, ],
+  distribution = "poisson", n.trees = 5000,
+  interaction.depth = 4)
+summary(boost_healy)
+```
+
+```{r}
+yhat_boost_healy <- predict(boost_healy, newdata = healy_axis_psr[-train, ], n.trees = 5000)
+mean((yhat_boost_healy-boost_healy$data$y)^2)
+sqrt(mean((yhat_boost_healy-boost_healy$data$y)^2))
+```
