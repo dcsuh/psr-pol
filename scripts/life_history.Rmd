@@ -54,8 +54,90 @@ pc1_scores %>% ggplot(.,aes(x=pc1,y=log10(n))) + geom_point()
 ```
 
 
-mock gbm
+Let's look at some trees
+We can start with just GMPD and Pantheria data
+
+```{r, message =F}
+gmpd <- read_csv(here("data/GMPD_main.csv"))
+panth1 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
+panth2 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR93_Aug2008.txt"))
+```
+
+Not totally sure what is difference between panth1 and panth2 but panth1 has more entries and has more records for every order when broken down by order so we'll use that for now
+
+Not sure what some of the final variables for panth really mean so we'll just exclude them for now
+```{r}
+panth1 %<>% select(MSW05_Order:`5-7_WeaningBodyMass_g_EXT`)
+```
+
+
+```{r}
+gmpd_PSR <- gmpd %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
+  group_by(HostCorrectedName) %>% summarize(psr=n())
+panth1 %<>% mutate(HostCorrectedName = MSW05_Binomial)
+gmpd_panth <- gmpd_PSR %>% inner_join(panth1, by="HostCorrectedName")
+```
+
+Let's deal with all the -999 and the references column and the numbers and weird stuff in the column names!!
+```{r}
+gmpd_panth <- na_if(gmpd_panth, -999.00)
+gmpd_panth %<>% dplyr::select(psr, 8, 9, 11, 13, 16, 18:23, 25, 26, 28, 30, 31, 33, 34, 35, 40)
+names(gmpd_panth) <- gsub("[[:digit:]]", "", names(gmpd_panth))
+names(gmpd_panth) <- gsub("-_", "", names(gmpd_panth))
+names(gmpd_panth) <- gsub("_", "", names(gmpd_panth))
+names(gmpd_panth) <- gsub(" ", "", names(gmpd_panth))
+names(gmpd_panth) <- gsub("/", "", names(gmpd_panth))
+```
+
+```{r}
+library(tree)
+set.seed(07981)
+train <- sample(1:nrow(gmpd_panth), nrow(gmpd_panth) / 2)
+tree_gmpd <- tree(psr~., gmpd_panth, subset = train)
+summary(tree_gmpd)
+```
+
+cross-validation
+```{r}
+cv_gmpd <- cv.tree(tree_gmpd)
+plot (cv_gmpd$size , cv_gmpd$dev, type = "b")
+```
+
+prune
+```{r}
+prune_gmpd <- prune.tree(tree_gmpd, best = 3)
+plot(prune_gmpd)
+text(prune_gmpd)
+```
+
+
+```{r}
+yhat <- predict(tree_gmpd, newdata = gmpd_panth[-train , ])
+gmpd_test <- gmpd_panth[-train , "psr"]
+plot(yhat, gmpd_test$psr)
+abline(0, 1)
+mean((yhat - gmpd_test$psr)^2)
+```
+
+
+
+
+
+
+test gbm
 ```{r}
 library(gbm)
+gmpd_panth %<>% dplyr::select()
+boost_gmpd <- gbm(psr~., data = gmpd_panth[train, ],
+  distribution = "gaussian", n.trees = 5000,
+  interaction.depth = 4)
+summary(boost_gmpd)
 ```
+
+```{r}
+yhat_boost <- predict(boost_gmpd, newdata = gmpd_panth[-train, ], n.trees = 5000)
+mean((yhat_boost-boost_gmpd$data$y)^2)
+sqrt(mean((yhat_boost-boost_gmpd$data$y)^2))
+```
+
 
