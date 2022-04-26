@@ -150,7 +150,15 @@ library(gbm)
 boost_gmpd <- gbm(psr~., data = gmpd_panth[train, ],
   distribution = "poisson", n.trees = 5000,
   interaction.depth = 4)
+```
+
+
+```{r}
 summary(boost_gmpd)
+plot.gbm(boost_gmpd, i.var=2)
+plot.gbm(boost_gmpd, i.var=11)
+plot.gbm(boost_gmpd, i.var=12)
+plot.gbm(boost_gmpd, i.var=16)
 ```
 
 ```{r}
@@ -189,7 +197,15 @@ train <- sample(1:nrow(gmpd_panth_v), nrow(gmpd_panth_v) / 2)
 boost_gmpd_v <- gbm(vsr~., data = gmpd_panth_v[train, ],
   distribution = "poisson", n.trees = 5000,
   interaction.depth = 4)
+```
+
+
+```{r}
 summary(boost_gmpd_v)
+plot.gbm(boost_gmpd_v, i.var=2)
+plot.gbm(boost_gmpd_v, i.var=11)
+plot.gbm(boost_gmpd_v, i.var=12)
+plot.gbm(boost_gmpd_v, i.var=16)
 ```
 
 ```{r}
@@ -222,13 +238,46 @@ train <- sample(1:nrow(gmpd_panth_h), nrow(gmpd_panth_h) / 2)
 boost_gmpd_h <- gbm(hsr~., data = gmpd_panth_h[train, ],
   distribution = "poisson", n.trees = 5000,
   interaction.depth = 4)
+```
+
+
+```{r}
 summary(boost_gmpd_h)
+plot.gbm(boost_gmpd_h, i.var=2)
+plot.gbm(boost_gmpd_h, i.var=11)
+plot.gbm(boost_gmpd_h, i.var=12)
+plot.gbm(boost_gmpd_h, i.var=16)
 ```
 
 ```{r}
 yhat_boost_h <- predict(boost_gmpd_h, newdata = gmpd_panth_h[-train, ], n.trees = 5000)
 mean((yhat_boost_h-boost_gmpd_h$data$y)^2)
 sqrt(mean((yhat_boost_h-boost_gmpd_h$data$y)^2))
+```
+ 
+ 
+```{r}
+plot.gbm(boost_gmpd, i.var=2)
+plot.gbm(boost_gmpd_v, i.var=2)
+plot.gbm(boost_gmpd_h, i.var=2)
+```
+
+```{r}
+plot.gbm(boost_gmpd, i.var=11)
+plot.gbm(boost_gmpd_v, i.var=11)
+plot.gbm(boost_gmpd_h, i.var=11)
+```
+
+```{r}
+plot.gbm(boost_gmpd, i.var=12)
+plot.gbm(boost_gmpd_v, i.var=12)
+plot.gbm(boost_gmpd_h, i.var=12)
+```
+
+```{r}
+plot.gbm(boost_gmpd, i.var=16)
+plot.gbm(boost_gmpd_v, i.var=16)
+plot.gbm(boost_gmpd_h, i.var=16)
 ```
  
  
