@@ -181,19 +181,56 @@ names(gmpd_panth_v) <- gsub("_", "", names(gmpd_panth_v))
 names(gmpd_panth_v) <- gsub(" ", "", names(gmpd_panth_v))
 names(gmpd_panth_v) <- gsub("/", "", names(gmpd_panth_v))
 ```
- 
+
+
 ```{r}
 train <- sample(1:nrow(gmpd_panth_v), nrow(gmpd_panth_v) / 2)
+
 boost_gmpd_v <- gbm(vsr~., data = gmpd_panth_v[train, ],
   distribution = "poisson", n.trees = 5000,
   interaction.depth = 4)
 summary(boost_gmpd_v)
 ```
+
 ```{r}
 yhat_boost_v <- predict(boost_gmpd_v, newdata = gmpd_panth_v[-train, ], n.trees = 5000)
 mean((yhat_boost_v-boost_gmpd_v$data$y)^2)
 sqrt(mean((yhat_boost_v-boost_gmpd_v$data$y)^2))
 ```
+ 
+Now again with helminths!
+ 
+```{r}
+gmpd_HSR <- gmpd %>% filter(ParType == "Helminth") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
+  group_by(HostCorrectedName) %>% summarize(hsr=n())
+gmpd_panth_h <- gmpd_HSR %>% inner_join(panth1, by="HostCorrectedName")
+```
+
+Let's deal with all the -999 and the references column and the numbers and weird stuff in the column names!!
+```{r}
+gmpd_panth_h <- na_if(gmpd_panth_h, -999.00)
+gmpd_panth_h %<>% dplyr::select(hsr, 8, 9, 11, 13, 16, 18:23, 25, 26, 28, 30, 31, 33, 34, 35, 40)
+names(gmpd_panth_h) <- gsub("[[:digit:]]", "", names(gmpd_panth_h))
+names(gmpd_panth_h) <- gsub("-_", "", names(gmpd_panth_h))
+names(gmpd_panth_h) <- gsub("_", "", names(gmpd_panth_h))
+names(gmpd_panth_h) <- gsub(" ", "", names(gmpd_panth_h))
+names(gmpd_panth_h) <- gsub("/", "", names(gmpd_panth_h))
+```
+ 
+```{r}
+train <- sample(1:nrow(gmpd_panth_h), nrow(gmpd_panth_h) / 2)
+boost_gmpd_h <- gbm(hsr~., data = gmpd_panth_h[train, ],
+  distribution = "poisson", n.trees = 5000,
+  interaction.depth = 4)
+summary(boost_gmpd_h)
+```
+
+```{r}
+yhat_boost_h <- predict(boost_gmpd_h, newdata = gmpd_panth_h[-train, ], n.trees = 5000)
+mean((yhat_boost_h-boost_gmpd_h$data$y)^2)
+sqrt(mean((yhat_boost_h-boost_gmpd_h$data$y)^2))
+```
+ 
  
  - see if Healy dataset makes more sense
  - do this with healy data instead for life history data
