@@ -281,6 +281,41 @@ library(cowplot)
 
 ```
 
+```{r}
+inv <- pdp::partial(boost_gmpd, n.trees=5000, "MaxLongevitym")
+
+plot1 <- inv %>%
+  #dplyr::select(coral.area, yhat) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_line(aes(x = MaxLongevitym, y = yhat),color="magenta4",size=1) +
+  xlim(0,750)+
+  ylab(" ") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),axis.text=element_text(size=12))
+
+plot2 <- gmpd_panth %>%
+  dplyr::select(MaxLongevitym) %>%
+  na.omit() %>%
+  ggplot(aes(MaxLongevitym)) +
+  geom_histogram(breaks=seq(0,750, by = 10),fill="thistle2") +
+  #geom_histogram(fill="gray",binwidth=20) +
+  scale_y_continuous(position = "right")+
+  ylab("") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
+#theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
+
+
+p1 <- add_sub(plot1," ")
+p2 <- add_sub(plot2,"MaxLongevity",size=12)
+p.maxLong<-ggdraw() +
+  draw_plot(p2,x=0.05,scale=0.95) +
+  draw_plot(p1,x=-0.04,scale=0.975,y=0.05)
+p.maxLong
+```
 
 ```{r}
 inv <- pdp::partial(boost_gmpd_v, n.trees=5000, "MaxLongevitym")
