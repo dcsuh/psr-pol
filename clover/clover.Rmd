@@ -71,7 +71,7 @@ pathogens %>% filter(PathogenType=="virus") %>% ggplot(.,aes(PathogenClass, fill
 
 Host Summary
 ```{r}
-ggplot(pathogens, aes(HostClass, fill = Database)) + geom_bar()
+ggplot(pathogens, aes(HostClass, fill = Database)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
 pathogens %>% filter(HostClass=="mammalia") %>% ggplot(.,aes(HostOrder,fill = Database)) + geom_bar() + theme(axis.text.x = element_text(angle=70, vjust = 0.5))
 ggplot(pathogens, aes(Database)) + geom_bar() + plotly()
 
@@ -84,6 +84,9 @@ GMPD Comparison
 clover_gmpd <- pathogens %>% filter(Database=="GMPD2")
 glover_PSR <- clover_gmpd %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
 gmpd_PSR <- gmpd %>% select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% group_by(HostCorrectedName) %>% summarize(psr=n())
+
+ggplot(clover_gmpd, aes(PathogenType)) + geom_bar()
+ggplot(gmpd, aes(ParType)) + geom_bar()
 table(clover_gmpd$PathogenType)
 table(gmpd$ParType)
 ```
