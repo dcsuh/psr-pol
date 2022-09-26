@@ -84,8 +84,8 @@ GMPD Comparison
 clover_gmpd <- pathogens %>% filter(Database=="GMPD2")
 glover_PSR <- clover_gmpd %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
 gmpd_PSR <- gmpd %>% select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% group_by(HostCorrectedName) %>% summarize(psr=n())
-head(glover_PSR)
-head(gmpd_PSR)
+table(clover_gmpd$PathogenType)
+table(gmpd$ParType)
 ```
 
 looks like gmpd has more parasites than the clover version of gmpd
