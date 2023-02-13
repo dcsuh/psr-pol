@@ -428,3 +428,10 @@ yhat_boost_healy <- predict(boost_healy, newdata = healy_axis_psr[-train, ], n.t
 mean((yhat_boost_healy-boost_healy$data$y)^2)
 sqrt(mean((yhat_boost_healy-boost_healy$data$y)^2))
 ```
+
+
+
+# Additional thoughts
+
+Should I try to find the hosts that have both helminths and viruses and then only use those for an analysis? So that the host dataset is at least the same. i.e. If we have the same hosts, and we assume we are comprehensive with both helminth and virus richness, then we can maybe be more confident that any patterns we see are real and not driven by parasite-induced sampling biases of hosts?
+
