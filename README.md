@@ -3,7 +3,7 @@
 
 links to some works in progress:
 
-[clover](/scripts/life_history.html)
+[life history](/scripts/life_history.html)
 
-[life history](/scripts/clover.html)
+[clover](/scripts/clover.html)
 
