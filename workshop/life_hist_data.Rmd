@@ -23,6 +23,8 @@ hormone <- read_csv(here("data/hormonebase/HormoneBase_v1.csv"))
 panth1 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
 panth2 <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR93_Aug2008.txt"))
 elton <- read_tsv(here("data/eltontraits/MamFuncDat.txt"))
+animaltraits <- read_csv(here("data/animaltraits/observations.csv"))
+combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_imputed.csv"))
 ```
 
 ```{r}
@@ -49,6 +51,34 @@ Compare pantheria
 ```{r}
 spec_panth1 <- panth1 %>% dplyr::select(1:5) %>% distinct()
 spec_panth2 <- panth2 %>% dplyr::select(1:5) %>% distinct()
+
+```
+
+```{r}
+summary(animaltraits)
+```
+
+```{r}
+summary(combine)
+```
+
+Just mammals pls
+```{r}
+amn <- amniote %>% filter(class == "Mammalia")
+ani <- animaltraits %>% filter(class == "Mammalia")
+hor <- hormone %>% filter(Vert_Group == "Mammal")
+```
+
+join some of these
+```{r}
+amn %<>% mutate(name = paste(genus, species, sep = "_"))
+ani %<>% mutate(name = paste(genus, specificEpithet, sep = "_"))
+hor %<>% mutate(name = paste(Genus, Species, sep = "_"))
+```
+
+```{r}
+tmp <- left_join(amn, ani)
+all_data <- left_join(tmp, hor)
 
 ```
 
