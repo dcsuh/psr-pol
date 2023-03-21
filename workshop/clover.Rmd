@@ -23,8 +23,8 @@ library(here)
 
 Read data  
 ```{r, message = F}
-mammal <- read_csv(here("clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
-columns <- read_csv(here("clover/CLOVER_ColumnDescriptions.csv"))
+mammal <- read_csv(here("data/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
+columns <- read_csv(here("data/clover/CLOVER_ColumnDescriptions.csv"))
 ```
 
 Check it out  
@@ -39,9 +39,9 @@ gmpd <- read_csv(here("data/GMPD_main.csv"))
 
 More data
 ```{r, message=F}
-viruses <- read_csv(here("clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
-helminths <- read_csv(here("clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
-bacteria <- read_csv(here("clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv"))
+viruses <- read_csv(here("data/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
+helminths <- read_csv(here("data/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
+bacteria <- read_csv(here("data/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv"))
 ```
 
 ```{r}
