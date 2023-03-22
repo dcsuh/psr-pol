@@ -1,0 +1,28 @@
+---
+title: "Healy data BRT"
+author: "Daniel Suh"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(here)
+```
+
+```{r}
+healy_axis <- read_csv(here("data/healy_axis_analysis.csv"))
+healy_host_par <- read_csv(here("data/healy_host_par.csv"))
+```
+
+Join Healy data with clover data
+```{r}
+viruses <- read_csv(here("data/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
+helminths <- read_csv(here("data/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
+bacteria <- read_csv(here("data/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv"))
+
+pathogens <- rbind(viruses,bacteria,helminths)
+
+```
+
