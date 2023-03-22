@@ -5,24 +5,63 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r}
+```{r, message = F}
 library(tidyverse)
 library(magrittr)
 library(here)
 ```
 
-```{r}
+```{r, message = F}
 healy_axis <- read_csv(here("data/healy_axis_analysis.csv"))
 healy_host_par <- read_csv(here("data/healy_host_par.csv"))
 ```
 
 Join Healy data with clover data
-```{r}
+```{r, message = F}
 viruses <- read_csv(here("data/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
 helminths <- read_csv(here("data/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
 bacteria <- read_csv(here("data/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv"))
 
 pathogens <- rbind(viruses,bacteria,helminths)
+```
+
+```{r}
+healy_axis %<>% mutate(Host = tolower(gsub("_", " ", species)))
+
+healy_axis_host <- healy_axis %>% dplyr::select(Host) %>% distinct()
+```
+
+```{r}
+psr <- pathogens %>% group_by(Host) %>% summarize(psr_h = sum(PathogenType=="helminth"),
+                                                  psr_v = sum(PathogenType=="virus"),
+                                                  psr_b = sum(PathogenType=="bacteria/rickettsia"),
+                                                  psr_p = sum(PathogenType=="protozoa"),
+                                                  psr_mi = sum(psr_v, psr_b, psr_p),
+                                                  psr = n())
+```
+
+
+```{r}
+healy_psr <- healy_axis_host %>% left_join(.,psr)
+healy_axis_psr <- healy_psr %>% left_join(., healy_axis)
+```
+
+```{r}
+healy_axis_psr_avg <- healy_axis_psr %>% 
+  group_by(species) %>% 
+  mutate_each(funs(mean), c(mean_life_expect:mass_g, repo_output, met_rate, min_max)) %>% 
+  distinct() %>%
+  ungroup()
+```
+
+```{r}
+healy_axis_psr_avg %>% dplyr::select(psr_h, psr_mi, mean_life_expect:mass_g, repo_output, met_rate, min_max) %>% pairs()
+```
+
+```{r}
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr)) + geom_point()
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr_h)) + geom_point()
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr_mi)) + geom_point()
 
 ```
 
