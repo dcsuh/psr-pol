@@ -28,7 +28,7 @@ pathogens <- rbind(viruses,bacteria,helminths)
 ```{r}
 healy_axis %<>% mutate(Host = tolower(gsub("_", " ", species)))
 
-healy_axis_host <- healy_axis %>% dplyr::select(Host) %>% distinct()
+healy_axis_host <- healy_axis %>% filter(taxa_name == "Mammalia") %>% dplyr::select(Host) %>% distinct()
 ```
 
 ```{r}
@@ -62,6 +62,13 @@ healy_axis_psr_avg %>% dplyr::select(psr_h, psr_mi, mean_life_expect:mass_g, rep
 healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr)) + geom_point()
 healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr_h)) + geom_point()
 healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=mean_life_expect, y=psr_mi)) + geom_point()
+
+```
+
+```{r}
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=gen_time, y=psr)) + geom_point()
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=gen_time, y=psr_h)) + geom_point()
+healy_axis_psr_avg %>% filter(psr<10000) %>% ggplot(aes(x=gen_time, y=psr_mi)) + geom_point()
 
 ```
 
