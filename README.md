@@ -7,3 +7,4 @@ links to some works in progress:
 
 [clover](/clover/clover.html)
 
+[database](/workshop/databases.html)
