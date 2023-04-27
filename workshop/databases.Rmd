@@ -1,0 +1,93 @@
+---
+title: "databases"
+author: "Daniel Suh"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Overview of each database
+
+
+```{r packages, message = F}
+library(here)
+library(tidyverse)
+library(magrittr)
+```
+
+```{r functions}
+makeMissing <- function(df) {
+  tibble(col = names(colSums(is.na(df))), missing = as.numeric(colSums(is.na(df))))
+}
+
+plotMissing <- function(df) {
+  df %>% arrange(missing) %>% 
+  mutate(col=factor(col, levels=col)) %>% 
+  ggplot(.,aes(x=col,y=missing)) + 
+    geom_col() + 
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    labs(title = deparse(substitute(df)))
+}
+```
+
+```{r setTheme}
+theme_set(theme_bw())
+```
+
+
+# Amniote
+
+```{r readAmniote}
+amniote <- read_csv(here("data", "amniote", "ECOL_96_269/Data_Files/Amniote_Database_Aug_2015.csv")) #average value from amniote2's ranges
+#amniote1 <- read_csv(here("data", "amniote", "ECOL_96_269/Data_Files/Amniote_Range_Count_Aug_2015.csv")) #ranges taken from amniote2's sources
+#amniote2 <- read_csv(here("data", "amniote", "ECOL_96_269/Data_Files/Amniote_Sparse_Table_Aug_2015.csv")) #all sources and observations
+```
+
+```{r exploreAmniote}
+amn_mamm <- amniote %>% filter(class == "Mammalia")
+amn_mamm[amn_mamm==-999] <- NA
+
+amn_missing <- makeMissing(amn_mamm)
+
+plotMissing(amn_missing)
+```
+
+# AnimalTraits
+
+```{r readAnimalTraits}
+animal <- read_csv(here("data", "animaltraits", "observations.csv"))
+```
+
+```{r exploreAnimalTraits}
+ani_mamm <- animal %>% filter(class == "Mammalia")
+
+ani_missing <- makeMissing(ani_mamm)
+
+plotMissing(ani_missing)
+```
+
+# EltonTraits
+
+```{r readElton}
+elton <- read_tsv(here("data", "eltontraits", "MamFuncDat.txt"))
+```
+
+```{r exploreElton}
+elton_missing <- makeMissing(elton)
+
+plotMissing(elton_missing)
+```
+
+# HormoneBase
+
+```{r readHormone}
+hormone <- read_csv(here("data", "hormonebase", "HormoneBase_v1.csv"))
+```
+
+```{r exploreHormone}
+horm_mamm <- hormone %>% filter(Vert_Group == "Mammal")
+
+horm_missing <- makeMissing(horm_mamm)
+
+plotMissing(horm_missing)
+```
+
