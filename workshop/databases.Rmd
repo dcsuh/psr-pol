@@ -95,26 +95,38 @@ plotMissing(horm_missing)
 
 ```{r}
 panth1 <- read_tsv(here("data", "pantheria", "ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
-panth2 <- read_tsv(here("data", "pantheria", "ECOL_90_184/PanTHERIA_1-0_WR93_Aug2008.txt"))
+#panth2 <- read_tsv(here("data", "pantheria", "ECOL_90_184/PanTHERIA_1-0_WR93_Aug2008.txt"))
 ```
+
+There are two pantheria files that are slightly different. I assume WR05 stands for 2005 and is the most up-to-date version so I will use that.
+
+# ```{r}
+# panth1_names <- panth1$MSW05_Binomial
+# panth2_names <- panth2$MSW93_Binomial
+# 
+# panth2_subset <- panth2[which(panth2_names %in% panth1_names),]
+# panth2_out <- panth2[which(!(panth2_names %in% panth1_names)),]
+# ```
 
 ```{r}
-panth1_names <- panth1$MSW05_Binomial
-panth2_names <- panth2$MSW93_Binomial
+panth1 %<>% rename_with(~ gsub("MSW05_","", .x, fixed = T))
+#panth2 %<>% rename_with(~ gsub("MSW93_","", .x, fixed = T))
 
-panth2_subset <- panth2[which(panth2_names %in% panth1_names),]
-panth2_out <- panth2[which(!(panth2_names %in% panth1_names)),]
+#panth1 %<>% rename_with(~ gsub("14-1_InterbirthInterval_d", "14-1_InterBirthInterval_d", .x, fixed = T))
+
+#panth1 %<>% rename_with(~ gsub("26-4_GR_MidRangeLat_dd", "26-4_GR_MRLat_dd", .x, fixed = T))
+
+#panth1 %<>% rename_with(~ gsub("26-7_GR_MidRangeLong_dd", "26-7_GR_MRLong_dd", .x, fixed = T))
+
+#panth <- rbind(panth1, panth2)
+
 ```
+
 
 ```{r}
+panth_missing <- makeMissing(panth1)
 
-rename_with()
-
-panth1 %<>% mutate(MSW05_Order = gsub("MSW([0-9])([0-9])_","",MSW05_Order),
-                   MSW05_Family = gsub("MSW([0-9])([0-9])_","",MSW05_Order),
-                   MSW05_Genus = gsub("MSW([0-9])([0-9])_","",MSW05_Order),
-                   MSW05_Order = gsub("MSW([0-9])([0-9])_","",MSW05_Order),
-                   MSW05_Order = gsub("MSW([0-9])([0-9])_","",MSW05_Order),)
-tmp <- read_csv(gsub("MSW*_","",panth1))
+plotMissing(panth_missing)
 ```
+
 
