@@ -1,0 +1,251 @@
+df,variable,classification
+amniote,class,taxonomy
+amniote,order,taxonomy
+amniote,family,taxonomy
+amniote,genus,taxonomy
+amniote,species,taxonomy
+amniote,subspecies,taxonomy
+amniote,common_name,taxonomy
+amniote,female_maturity_d,reproduction
+amniote,litter_or_clutch_size_n,reproduction
+amniote,litters_or_clutches_per_y,reproduction
+amniote,adult_body_mass_g,morphology
+amniote,maximum_longevity_y,age
+amniote,gestation_d,reproduction
+amniote,weaning_d,development
+amniote,birth_or_hatching_weight_g,morphology
+amniote,weaning_weight_g,morphology
+amniote,egg_mass_g,morphology
+amniote,incubation_d,development
+amniote,fledging_age_d,development
+amniote,longevity_y,age
+amniote,male_maturity_d,development
+amniote,inter_litter_or_interbirth_interval_y,reproduction
+amniote,female_body_mass_g,morphology
+amniote,male_body_mass_g,morphology
+amniote,no_sex_body_mass_g,morphology
+amniote,egg_width_mm,morphology
+amniote,egg_length_mm,morphology
+amniote,fledging_mass_g,morphology
+amniote,adult_svl_cm,morphology
+amniote,male_svl_cm,morphology
+amniote,female_svl_cm,morphology
+amniote,birth_or_hatching_svl_cm,morphology
+amniote,female_svl_at_maturity_cm,morphology
+amniote,female_body_mass_at_maturity_g,morphology
+amniote,no_sex_svl_cm,morphology
+amniote,no_sex_maturity_d,morphology
+animal,phylum,taxonomy
+animal,class,taxonomy
+animal,order,taxonomy
+animal,family,taxonomy
+animal,genus,taxonomy
+animal,species,taxonomy
+animal,specificEpithet,taxonomy
+animal,sex,sex
+animal,sampleSizeValue,data
+animal,inTextReference,data
+animal,publicationYear,data
+animal,fullReference,data
+animal,body mass,morphology
+animal,body mass - units,morphology
+animal,body mass - minimum,morphology
+animal,body mass - maximum,morphology
+animal,body mass - method,morphology
+animal,body mass - comments,morphology
+animal,body mass - metadata comment,morphology
+animal,original body mass,morphology
+animal,original body mass - units,morphology
+animal,metabolic rate,metabolism
+animal,metabolic rate - units,metabolism
+animal,metabolic rate - minimum,metabolism
+animal,metabolic rate - maximum,metabolism
+animal,metabolic rate - method,metabolism
+animal,metabolic rate - comments,metabolism
+animal,metabolic rate - metadata comment,metabolism
+animal,original metabolic rate,metabolism
+animal,original metabolic rate - units,metabolism
+animal,original respiratoryQuotient,metabolism
+animal,original temperature,metabolism
+animal,mass-specific metabolic rate,metabolism
+animal,mass-specific metabolic rate - units,metabolism
+animal,brain size,morphology
+animal,brain size - units,morphology
+animal,brain size - minimum,morphology
+animal,brain size - maximum,morphology
+animal,brain size - method,morphology
+animal,brain size - comments,morphology
+animal,brain size - metadata comment,morphology
+animal,original brain size,morphology
+animal,original brain size - units,morphology
+elton,MSW3_ID,data
+elton,Scientific,taxonomy
+elton,MSWFamilyLatin,taxonomy
+elton,Diet-Inv,diet
+elton,Diet-Vend,diet
+elton,Diet-Vect,diet
+elton,Diet-Vfish,diet
+elton,Diet-Vunk,diet
+elton,Diet-Scav,diet
+elton,Diet-Fruit,diet
+elton,Diet-Nect,diet
+elton,Diet-Seed,diet
+elton,Diet-PlantO,diet
+elton,Diet-Source,diet
+elton,Diet-Certainty,diet
+elton,ForStrat-Value,behavior
+elton,ForStrat-Certainty,behavior
+elton,ForStrat-Comment,behavior
+elton,Activity-Nocturnal,behavior
+elton,Activity-Crepuscular,behavior
+elton,Activity-Diurnal,behavior
+elton,Activity-Source,behavior
+elton,Activity-Certainty,behavior
+elton,BodyMass-Value,morphology
+elton,BodyMass-Source,morphology
+elton,BodyMass-SpecLevel,morphology
+hormone,Vert_Group,taxonomy
+hormone,Genus,taxonomy
+hormone,Species,taxonomy
+hormone,Common_name,taxonomy
+hormone,Population_1,data
+hormone,Population_2,data
+hormone,Population_3,data
+hormone,Latitude,abiotic
+hormone,Longitude,abiotic
+hormone,LatLongEst,abiotic
+hormone,Elevation,abiotic
+hormone,Years,unknown
+hormone,Year_1,unknown
+hormone,Year_final,unknown
+hormone,Breeding_Cycle,reproduction
+hormone,Moult,development
+hormone,Life_Stage,data
+hormone,LifeHistConf,data
+hormone,Jan_Sampled,data
+hormone,Feb_Sampled,data
+hormone,Mar_Sampled,data
+hormone,Apr_Sampled,data
+hormone,May_Sampled,data
+hormone,June_Sampled,data
+hormone,July_Sampled,data
+hormone,Aug_Sampled,data
+hormone,Sept_Sampled,data
+hormone,Oct_Sampled,data
+hormone,Nov_Sampled,data
+hormone,Dec_Sampled,data
+hormone,Time_min,data
+hormone,Time_max,data
+hormone,CaptureMethod,data
+hormone,SampleMethod,data
+hormone,MaxLatency_A,hormone
+hormone,MaxLate_Cort,hormone
+hormone,LateStressCort,hormone
+hormone,StressorType,data
+hormone,MajorStressPop,data
+hormone,Method,data
+hormone,A_AntibodyKit,hormone
+hormone,Cort_AntibodyKit,hormone
+hormone,CORT,hormone
+hormone,Androgen,hormone
+hormone,M_A_Mean,hormone
+hormone,M_A_SE,hormone
+hormone,M_A_CV,hormone
+hormone,M_A_N,hormone
+hormone,M_A_Min,hormone
+hormone,M_A_Max,hormone
+hormone,M_A_RemoveOutlier,hormone
+hormone,F_A_Mean,hormone
+hormone,F_A_SE,hormone
+hormone,F_A_CV,hormone
+hormone,F_A_N,hormone
+hormone,F_A_Min,hormone
+hormone,F_A_Max,hormone
+hormone,F_A_RemoveOutlier,hormone
+hormone,M_BC_Mean,hormone
+hormone,M_BC_SE,hormone
+hormone,M_BC_CV,hormone
+hormone,M_BC_N,hormone
+hormone,M_BC_Min,hormone
+hormone,M_BC_Max,hormone
+hormone,M_BC_RemoveOutlir,hormone
+hormone,F_BC_Mean,hormone
+hormone,F_BC_SE,hormone
+hormone,F_BC_CV,hormone
+hormone,F_BC_N,hormone
+hormone,F_BC_Min,hormone
+hormone,F_BC_Max,hormone
+hormone,F_BC_RemoveOutlir,hormone
+hormone,M_SC_Mean,hormone
+hormone,M_SC_SE,hormone
+hormone,M_SC_CV,hormone
+hormone,M_SC_N,hormone
+hormone,M_SC_Min,hormone
+hormone,M_SC_Max,hormone
+hormone,M_SC_RemoveOutlier,hormone
+hormone,F_SC_Mean,hormone
+hormone,F_SC_SE,hormone
+hormone,F_SC_CV,hormone
+hormone,F_SC_N,hormone
+hormone,F_SC_Min,hormone
+hormone,F_SC_Max,hormone
+hormone,F_SC_RemoveOutlier,hormone
+hormone,OutlierCriteria,data
+hormone,Notes,data
+hormone,Lab_ID,data
+hormone,Ref_ID,data
+panth,Order,taxonomy
+panth,Family,taxonomy
+panth,Genus,taxonomy
+panth,Species,taxonomy
+panth,Binomial,taxonomy
+panth,1-1_ActivityCycle,behavior
+panth,5-1_AdultBodyMass_g,morphology
+panth,8-1_AdultForearmLen_mm,morphology
+panth,13-1_AdultHeadBodyLen_mm,morphology
+panth,2-1_AgeatEyeOpening_d,development
+panth,3-1_AgeatFirstBirth_d,development
+panth,18-1_BasalMetRate_mLO2hr,metabolism
+panth,5-2_BasalMetRateMass_g,metabolism
+panth,6-1_DietBreadth,diet
+panth,7-1_DispersalAge_d,development
+panth,9-1_GestationLen_d,reproduction
+panth,12-1_HabitatBreadth,abiotic
+panth,22-1_HomeRange_km2,abiotic
+panth,22-2_HomeRange_Indiv_km2,abiotic
+panth,14-1_InterbirthInterval_d,reproduction
+panth,15-1_LitterSize,reproduction
+panth,16-1_LittersPerYear,reproduction
+panth,17-1_MaxLongevity_m,age
+panth,5-3_NeonateBodyMass_g,morphology
+panth,13-2_NeonateHeadBodyLen_mm,morphology
+panth,21-1_PopulationDensity_n/km2,sociality
+panth,10-1_PopulationGrpSize,sociality
+panth,23-1_SexualMaturityAge_d,development
+panth,10-2_SocialGrpSize,sociality
+panth,24-1_TeatNumber,morphology
+panth,12-2_Terrestriality,abiotic
+panth,6-2_TrophicLevel,unknown
+panth,25-1_WeaningAge_d,development
+panth,5-4_WeaningBodyMass_g,morphology
+panth,13-3_WeaningHeadBodyLen_mm,morphology
+panth,References,data
+panth,5-5_AdultBodyMass_g_EXT,morphology
+panth,16-2_LittersPerYear_EXT,reproduction
+panth,5-6_NeonateBodyMass_g_EXT,morphology
+panth,5-7_WeaningBodyMass_g_EXT,morphology
+panth,26-1_GR_Area_km2,data
+panth,26-2_GR_MaxLat_dd,data
+panth,26-3_GR_MinLat_dd,data
+panth,26-4_GR_MidRangeLat_dd,data
+panth,26-5_GR_MaxLong_dd,data
+panth,26-6_GR_MinLong_dd,data
+panth,26-7_GR_MidRangeLong_dd,data
+panth,27-1_HuPopDen_Min_n/km2,anthro
+panth,27-2_HuPopDen_Mean_n/km2,anthro
+panth,27-3_HuPopDen_5p_n/km2,anthro
+panth,27-4_HuPopDen_Change,anthro
+panth,28-1_Precip_Mean_mm,abiotic
+panth,28-2_Temp_Mean_01degC,abiotic
+panth,30-1_AET_Mean_mm,abiotic
+panth,30-2_PET_Mean_mm,abiotic
