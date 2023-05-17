@@ -3,8 +3,8 @@
 
 links to some works in progress:
 
-[life history](/scripts/life_history.html)
+[life history](/workshop/life_history.html)
 
-[clover](/clover/clover.html)
+[clover](/workshop/clover.html)
 
 [database](/workshop/databases.html)
