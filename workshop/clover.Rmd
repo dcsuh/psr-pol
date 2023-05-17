@@ -103,23 +103,39 @@ looks like gmpd has more parasites than the clover version of gmpd. So the clove
 
 Are the records in EID2 in clover using the genbank data only or also uses the text mined data?
 ```{r}
-eid <- pathogens %>% filter(Database == "EID2")
-eid %>% ggplot(., aes(x=DetectionMethodOriginal)) + geom_histogram(stat = "count")
+eid_clover <- pathogens %>% filter(Database == "EID2")
+eid_clover %>% ggplot(., aes(x=DetectionMethodOriginal)) + geom_histogram(stat = "count")
 ```
 
 Hmm NCBI nucleotide seems like genbank while cargocarrier may just be the text mined ones.
 
 ```{r}
-eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=PathogenType)) + geom_histogram(stat = "count")
-eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=HostClass)) + geom_histogram(stat = "count")
-eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% filter(HostClass == "mammalia") %>% ggplot(., aes(x=HostOrder)) + geom_histogram(stat = "count") + theme(axis.text.x = element_text(angle = 70, hjust = 1))
+eid_clover %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=PathogenType)) + geom_histogram(stat = "count")
+eid_clover %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=HostClass)) + geom_histogram(stat = "count")
+eid_clover %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% filter(HostClass == "mammalia") %>% ggplot(., aes(x=HostOrder)) + geom_histogram(stat = "count") + theme(axis.text.x = element_text(angle = 70, hjust = 1))
 ```
 
 How does clover's EID2 compare to the EID2 that I use?
 
 ```{r}
-
+eid <- read_csv(here("previous work", "data", "source", "EID2_full.csv"))
 ```
+
+```{r}
+table(eid$`Cargo classification`)
+table(eid_clover$PathogenType)
+
+cleid_ncbi <- eid_clover %>% filter(DetectionMethodOriginal == "NCBI Nucleotide")
+table(cleid_ncbi$PathogenType)
+```
+
+
+Hmmm EID2 from clover is wayyyy larger than the EID2 I have.
+
+
+
+
+Check for sampling bias between datasets. How sensitive is PSR to number of records of database?
 
 
 
