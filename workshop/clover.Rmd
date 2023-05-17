@@ -23,13 +23,13 @@ library(here)
 
 Read data  
 ```{r, message = F}
-mammal <- read_csv(here("data/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
+mammal_viruses <- read_csv(here("data/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
 columns <- read_csv(here("data/clover/CLOVER_ColumnDescriptions.csv"))
 ```
 
 Check it out  
 ```{r}
-mammal_psr <- mammal %>% select(Host, Virus) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
+mammal_vsr <- mammal_viruses %>% select(Host, Virus) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
 ```
 
 
@@ -45,7 +45,11 @@ bacteria <- read_csv(here("data/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.
 ```
 
 ```{r}
-pathogens <- rbind(viruses,bacteria,helminths)
+colnames(mammal_viruses) <- gsub("Virus", "Pathogen", colnames(mammal_viruses))
+mammal_viruses %<>% mutate(PathogenType = "virus")
+
+pathogens <- rbind(viruses,bacteria,helminths,mammal_viruses)
+pathogens <- distinct(pathogens)
 summary(pathogens)
 #table(pathogens$HostOrder)
 #table(pathogens$PathogenType)
@@ -80,6 +84,7 @@ pathogens %>% group_by(Database) %>% summarize(n=n()) %>% plot_ly(x= ~Database, 
 
 GMPD Comparison
 
+Is the entire GMPD dataset within clover or does clover filter out some of the GMPD records or uses a less complete version?
 ```{r}
 clover_gmpd <- pathogens %>% filter(Database=="GMPD2")
 glover_PSR <- clover_gmpd %>% select(Host, Pathogen) %>% distinct() %>% group_by(Host) %>% summarize(psr = n())
@@ -91,23 +96,48 @@ table(clover_gmpd$PathogenType)
 table(gmpd$ParType)
 ```
 
-looks like gmpd has more parasites than the clover version of gmpd
+looks like gmpd has more parasites than the clover version of gmpd. So the clover version of gmpd is not as comprehensive as actual gmpd but why??
+
+
+# EID2
+
+Are the records in EID2 in clover using the genbank data only or also uses the text mined data?
+```{r}
+eid <- pathogens %>% filter(Database == "EID2")
+eid %>% ggplot(., aes(x=DetectionMethodOriginal)) + geom_histogram(stat = "count")
+```
+
+Hmm NCBI nucleotide seems like genbank while cargocarrier may just be the text mined ones.
+
+```{r}
+eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=PathogenType)) + geom_histogram(stat = "count")
+eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% ggplot(., aes(x=HostClass)) + geom_histogram(stat = "count")
+eid %>% filter(DetectionMethodOriginal == "NCBI Nucleotide") %>% filter(HostClass == "mammalia") %>% ggplot(., aes(x=HostOrder)) + geom_histogram(stat = "count") + theme(axis.text.x = element_text(angle = 70, hjust = 1))
+```
+
+How does clover's EID2 compare to the EID2 that I use?
+
+```{r}
+
+```
+
+
 
 
 Parasite diversity matrix
+
 Each row is a host
+
 Each column is a parasite or parasite order
+
 Counts are host-parasite associations by parasite order
+
 Using phylogenetic data, an index of diversity can be measured for each host
+
 ```{r}
 para_by_order <- pathogens %>% select(Host, HostOrder, Pathogen, PathogenOrder) %>% distinct() %>% group_by(Host, PathogenOrder) %>% summarize(n=n())
 host_sp_para_order_mat <- para_by_order %>% pivot_wider(names_from = PathogenOrder, values_from = n)
 ```
 
-life history datasets
 
-```{r}
-healy_axis <- read_csv(here("data/healy_axis_analysis.csv"))
-
-```
 
