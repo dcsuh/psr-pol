@@ -1,0 +1,67 @@
+---
+title: "BRT Test"
+author: "Daniel Suh"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r packages}
+library(tidyverse)
+library(magrittr)
+library(here)
+
+library(dismo)
+library(gbm)
+
+source(here("previous work", "elith_tutorial", "brt.functions.R"))
+```
+
+
+```{r read}
+gmpd <- read_csv(here("data/GMPD_main.csv"))
+panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
+```
+
+
+```{r psr}
+gmpd_PSR <- gmpd %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+panth %<>% mutate(HostCorrectedName = MSW05_Binomial)
+gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
+```
+
+
+```{r NAs}
+gmpd_panth[gmpd_panth == -999.00] <- NA
+```
+
+
+```{r partition data}
+set.seed(07981)
+train <- sample(1:nrow(gmpd_panth), nrow(gmpd_panth) / 2)
+test <- gmpd_panth %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+gmpd_panth_train <- gmpd_panth[train,]
+gmpd_panth_test <- gmpd_panth[test,]
+```
+
+
+```{r initial model}
+brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 3:7, gbm.y= 2,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.01, bag.fraction = 0.5)
+```
+
+
+
+
+
+
+
+
+
+
+
+
