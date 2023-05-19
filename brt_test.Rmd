@@ -36,7 +36,7 @@ gmpd_panth$MSW05_Order <- as.factor(gmpd_panth$MSW05_Order)
 gmpd_panth$MSW05_Family <- as.factor(gmpd_panth$MSW05_Family)
 gmpd_panth$MSW05_Genus <- as.factor(gmpd_panth$MSW05_Genus)
 
-gmpd_panth %<>% drop_na()
+gmpd_panth %<>% dplyr::select(!(`13-3_WeaningHeadBodyLen_mm`))
 ```
 
 
@@ -49,9 +49,14 @@ gmpd_panth_train <- gmpd_panth[train,]
 gmpd_panth_test <- gmpd_panth[test,]
 ```
 
+```{r}
+gmpd_panth_train <- as.data.frame(gmpd_panth_train)
+gmpd_panth_test <- as.data.frame(gmpd_panth_test)
+```
+
 
 ```{r initial model}
-brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 3:5, gbm.y= 2,
+brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 8:56, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.01, bag.fraction = 0.5)
 ```
@@ -67,7 +72,7 @@ elton <- read_tsv(here("data", "eltontraits", "MamFuncDat.txt"))
 ```{r}
 elton %<>% mutate(HostCorrectedName = Scientific)
 
-gmpd_elton <- gmpd_PSR %>% inner_join(elton, by = "HostCorrectedName")
+gmpd_elton <- as.data.frame(gmpd_PSR %>% inner_join(elton, by = "HostCorrectedName"))
 
 gmpd_elton %<>% dplyr::select(!c("ForStrat-Comment", "Diet-Source", "Diet-Certainty","ForStrat-Certainty",
                                  "Activity-Source", "Activity-Certainty", "BodyMass-Source"))
@@ -78,30 +83,11 @@ gmpd_elton$`ForStrat-Value` <- as.factor(gmpd_elton$`ForStrat-Value`)
 
 
 ```{r}
-elton_brt_5_0.01 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
-                 family = "gaussian", tree.complexity = 5,
-                 learning.rate = 0.01, bag.fraction = 0.5)
+elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.001, bag.fraction = 0.5)
 ```
 
 
-Try with HormoneBase data
-
-```{r}
-hormone <- read_csv(here("data", "hormonebase", "HormoneBase_v1.csv"))
-```
-
-
-```{r}
-hormone %<>% mutate(HostCorrectedName = paste(Genus, Species, sep = " "))
-
-gmpd_horm <- gmpd_PSR %>% inner_join(hormone, by = "HostCorrectedName")
-```
-
-
-```{r}
-horm_brt_5_0.01 <- gbm.step(data = gmpd_horm, gbm.x = 6:21, gbm.y= 2,
-                 family = "gaussian", tree.complexity = 5,
-                 learning.rate = 0.01, bag.fraction = 0.5)
-```
 
 
