@@ -25,25 +25,34 @@ gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
 ```
 
+```{r NAs}
+panth[panth == -999.00] <- NA
+
+colnames(panth) <- gsub("\\d+-\\d+_", "", colnames(panth))
+colnames(panth) <- gsub("*\\d+", "", colnames(panth))
+
+
+panth$ref_count <- str_count(panth$References, ";")
+
+panth$`ActivityCycle` <- as.factor(panth$`ActivityCycle`)
+panth$`DietBreadth` <- as.factor(panth$`DietBreadth`)
+panth$`HabitatBreadth` <- as.factor(panth$`HabitatBreadth`)
+panth$`Terrestriality` <- as.factor(panth$`Terrestriality`)
+panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
+
+panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, References, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, MSW_Order, `GR_MaxLat_dd`, `GR_MinLong_dd`, `WeaningBodyMass_g`)) #too many NAs or just taxon
+```
+
 
 ```{r psr}
 gmpd_PSR <- gmpd %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
   summarize(psr=n())
-panth %<>% mutate(HostCorrectedName = MSW05_Binomial)
+panth %<>% mutate(HostCorrectedName = MSW_Binomial)
 gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
 ```
 
-
-```{r NAs}
-gmpd_panth[gmpd_panth == -999.00] <- NA
-gmpd_panth$MSW05_Order <- as.factor(gmpd_panth$MSW05_Order)
-gmpd_panth$MSW05_Family <- as.factor(gmpd_panth$MSW05_Family)
-gmpd_panth$MSW05_Genus <- as.factor(gmpd_panth$MSW05_Genus)
-
-gmpd_panth %<>% dplyr::select(!(`13-3_WeaningHeadBodyLen_mm`))
-```
 
 
 ```{r partition data}
@@ -62,10 +71,60 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 
 
 ```{r initial model}
-brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 8:56, gbm.y= 2,
+brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 4:45, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.01, bag.fraction = 0.5)
+                 learning.rate = 0.004, bag.fraction = 0.5)
 ```
+
+```{r}
+summary(brt1)
+```
+# Try again by parasite type
+
+```{r}
+gmpd_macro <- gmpd %>% filter(ParType %in% c("Arthropod", "Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_micro <- gmpd %>% filter(ParType %in% c("Bacteria", "Protozoa", "Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+```
+
+```{r}
+gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(panth, by="HostCorrectedName"))
+gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorrectedName"))
+```
+
+```{r}
+brt2 <- gbm.step(data = gmpd_panth_macro, gbm.x = 4:45, gbm.y= 2,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+
+brt3 <- gbm.step(data = gmpd_panth_micro, gbm.x = 4:45, gbm.y= 2,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+
+```
+
+```{r}
+summary(brt2)
+summary(brt3)
+```
+```{r}
+gbm.plot(brt1, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt2, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt3, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
+```
+
+```{r}
+gbm.plot(brt1, variable.no = 17)
+gbm.plot(brt2, variable.no = 17)
+```
+
+
 
 
 # Try with EltonTraits instead of Pantheria
@@ -94,6 +153,9 @@ elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
                  learning.rate = 0.001, bag.fraction = 0.5)
 ```
 
+```{r}
+summary(elton_brt_5_0.001)
+```
 
 
 

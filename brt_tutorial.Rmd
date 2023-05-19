@@ -49,5 +49,9 @@ angaus.tc5.lr005 <- gbm.step(data=angaus,
 summary(angaus.tc5.lr005)
 ```
 
+```{r}
+gbm.plot(angaus.tc5.lr005)
+```
+
 
 
