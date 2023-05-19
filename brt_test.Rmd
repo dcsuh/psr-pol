@@ -5,6 +5,12 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+# Important note
+
+Functions from brt.functions.R require data to be in "data.frame" format. Make sure to reclass any data using as.data.frame() before running gbm.step
+
+
+
 ```{r packages}
 library(tidyverse)
 library(magrittr)
