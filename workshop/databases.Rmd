@@ -152,6 +152,11 @@ panth1 %<>% rename_with(~ gsub("MSW05_","", .x, fixed = T))
 
 ```
 
+```{r}
+panth1[panth1 == -999.0] <- NA
+```
+
+
 
 ```{r}
 panth_missing <- makeMissing(panth1)

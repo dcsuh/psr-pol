@@ -10,7 +10,6 @@ library(tidyverse)
 library(magrittr)
 library(here)
 
-library(dismo)
 source(here("previous work", "elith_tutorial", "brt.functions.R"))
 
 ```
@@ -29,4 +28,26 @@ angaus.tc5.lr01 <- gbm.step(data=angaus,
     learning.rate = 0.01,
     bag.fraction = 0.5)
 ```
+
+
+```{r}
+summary(angaus.tc5.lr01)
+```
+
+```{r}
+angaus.tc5.lr005 <- gbm.step(data=angaus,
+    gbm.x = 3:14,
+    gbm.y = 2,
+    family = "bernoulli",
+    tree.complexity = 5,
+    learning.rate = 0.005,
+    bag.fraction = 0.5)
+
+```
+
+```{r}
+summary(angaus.tc5.lr005)
+```
+
+
 

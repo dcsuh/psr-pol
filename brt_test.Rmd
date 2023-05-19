@@ -10,9 +10,6 @@ library(tidyverse)
 library(magrittr)
 library(here)
 
-library(dismo)
-library(gbm)
-
 source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
@@ -35,6 +32,11 @@ gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
 
 ```{r NAs}
 gmpd_panth[gmpd_panth == -999.00] <- NA
+gmpd_panth$MSW05_Order <- as.factor(gmpd_panth$MSW05_Order)
+gmpd_panth$MSW05_Family <- as.factor(gmpd_panth$MSW05_Family)
+gmpd_panth$MSW05_Genus <- as.factor(gmpd_panth$MSW05_Genus)
+
+gmpd_panth %<>% drop_na()
 ```
 
 
@@ -49,14 +51,37 @@ gmpd_panth_test <- gmpd_panth[test,]
 
 
 ```{r initial model}
-brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 3:7, gbm.y= 2,
+brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 3:5, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.01, bag.fraction = 0.5)
 ```
 
 
+# Try with EltonTraits instead of Pantheria
 
 
+```{r}
+elton <- read_tsv(here("data", "eltontraits", "MamFuncDat.txt"))
+```
+
+```{r}
+elton %<>% mutate(HostCorrectedName = Scientific)
+
+gmpd_elton <- gmpd_PSR %>% inner_join(elton, by = "HostCorrectedName")
+
+gmpd_elton %<>% dplyr::select(!c("ForStrat-Comment", "Diet-Source", "Diet-Certainty","ForStrat-Certainty",
+                                 "Activity-Source", "Activity-Certainty", "BodyMass-Source"))
+
+gmpd_elton$`ForStrat-Value` <- as.factor(gmpd_elton$`ForStrat-Value`)
+```
+
+
+
+```{r}
+elton_brt_5_0.01 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
+                 family = "gaussian", tree.complexity = 5,
+                 learning.rate = 0.01, bag.fraction = 0.5)
+```
 
 
 
