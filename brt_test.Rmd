@@ -84,9 +84,24 @@ elton_brt_5_0.01 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
 ```
 
 
+Try with HormoneBase data
+
+```{r}
+hormone <- read_csv(here("data", "hormonebase", "HormoneBase_v1.csv"))
+```
 
 
+```{r}
+hormone %<>% mutate(HostCorrectedName = paste(Genus, Species, sep = " "))
+
+gmpd_horm <- gmpd_PSR %>% inner_join(hormone, by = "HostCorrectedName")
+```
 
 
+```{r}
+horm_brt_5_0.01 <- gbm.step(data = gmpd_horm, gbm.x = 6:21, gbm.y= 2,
+                 family = "gaussian", tree.complexity = 5,
+                 learning.rate = 0.01, bag.fraction = 0.5)
+```
 
 
