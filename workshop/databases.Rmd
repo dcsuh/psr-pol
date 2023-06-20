@@ -227,3 +227,17 @@ gmpd_missing <- makeMissing(gmpd)
 plotMissing(gmpd_missing)
 ```
 
+
+
+# How much data do I add from each database
+
+Get host names from each database
+```{r}
+
+```
+
+
+
+
+
+

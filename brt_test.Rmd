@@ -157,5 +157,9 @@ elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
 summary(elton_brt_5_0.001)
 ```
 
+```{r}
+gbm.plot(elton_brt_5_0.001, variable.no = 1)
+```
+
 
 
