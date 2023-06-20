@@ -276,15 +276,38 @@ names_mat %>% ggplot(.,aes(para_yes)) + geom_histogram()
 ```{r}
 library(VennDiagram)
 
-venn.diagram(x = list(amn_mamm_names, ani_mamm_names, elton_names),
-             category.names = c("amniote", "animaltraits", "elton"),
-             filename = "hosts_overlap.png",
+venn.diagram(x = list(amn_mamm_names, gmpd_names, clover_names),
+             category.names = c("amniote", "gmpd", "clover"),
+             filename = "amniote_overlap.png",
              output=T)
 
+venn.diagram(x = list(ani_mamm_names, gmpd_names, clover_names),
+             category.names = c("animalTraits", "gmpd", "clover"),
+             filename = "animalTraits_overlap.png",
+             output=T)
 
+venn.diagram(x = list(elton_names, gmpd_names, clover_names),
+             category.names = c("Elton", "gmpd", "clover"),
+             filename = "elton_overlap.png",
+             output=T)
+
+venn.diagram(x = list(horm_mamm_names, gmpd_names, clover_names),
+             category.names = c("hormone", "gmpd", "clover"),
+             filename = "hormone_overlap.png",
+             output=T)
+
+venn.diagram(x = list(panth_names, gmpd_names, clover_names),
+             category.names = c("Pantheria", "gmpd", "clover"),
+             filename = "panth_overlap.png",
+             output=T)
+
+venn.diagram(x = list(amn_mamm_names, elton_names, panth_names),
+             category.names = c("amniote", "elton", "pantheria"),
+             filename = "hosts_overlap.png",
+             output=T)
 ```
 
-
+Amniote, Elton, and Panth share 336 hosts with both gmpd and clover and about 660 with clover.
 
 
 
