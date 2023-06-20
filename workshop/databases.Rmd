@@ -259,9 +259,19 @@ tibble(all_hosts = all_host_names,
        gmpd = as.numeric(all_host_names %in% gmpd_names),
        clover = as.numeric(all_host_names %in% clover_names))
 
-names_mat %<>%  mutate(host_yes = rowSums(across(c(amniote:panth))),
+names_mat %<>% mutate(host_yes = rowSums(across(c(amniote:panth))),
                        para_yes = rowSums(across(c(gmpd:clover))))
+
+names_mat_subset <- names_mat %>% filter(para_yes>0)
 ```
+
+```{r}
+names_mat %>% ggplot(.,aes(host_yes)) + geom_histogram()
+names_mat_subset %>% ggplot(.,aes(host_yes)) + geom_histogram()
+names_mat %>% ggplot(.,aes(para_yes)) + geom_histogram()
+```
+
+
 
 ```{r}
 library(VennDiagram)
