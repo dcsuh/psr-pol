@@ -1,0 +1,15 @@
+INFO [2023-06-20 11:17:26] $x
+INFO [2023-06-20 11:17:26] list(amn_mamm_names, elton_names, panth_names, ani_mamm_names, 
+INFO [2023-06-20 11:17:26]     clover_names, gmpd)
+INFO [2023-06-20 11:17:26] 
+INFO [2023-06-20 11:17:26] $category.names
+INFO [2023-06-20 11:17:26] c("amniote", "elton", "pantheria", "animalTraits", "clover", 
+INFO [2023-06-20 11:17:26]     "gmpd")
+INFO [2023-06-20 11:17:26] 
+INFO [2023-06-20 11:17:26] $filename
+INFO [2023-06-20 11:17:26] [1] "full_overlap.png"
+INFO [2023-06-20 11:17:26] 
+INFO [2023-06-20 11:17:26] $output
+INFO [2023-06-20 11:17:26] T
+INFO [2023-06-20 11:17:26] 
+ERROR [2023-06-20 11:17:27] NAs in dataset

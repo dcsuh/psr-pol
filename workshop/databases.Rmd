@@ -273,7 +273,7 @@ names_mat %>% ggplot(.,aes(para_yes)) + geom_histogram()
 
 
 
-```{r}
+```{r, eval = F}
 library(VennDiagram)
 
 venn.diagram(x = list(amn_mamm_names, gmpd_names, clover_names),
@@ -305,9 +305,16 @@ venn.diagram(x = list(amn_mamm_names, elton_names, panth_names),
              category.names = c("amniote", "elton", "pantheria"),
              filename = "hosts_overlap.png",
              output=T)
+
+venn.diagram(x = list(amn_mamm_names, elton_names, panth_names, clover_names),
+             category.names = c("amniote", "elton", "pantheria", "clover"),
+             filename = "hosts_clover_overlap.png",
+             output=T)
+
+
 ```
 
-Amniote, Elton, and Panth share 336 hosts with both gmpd and clover and about 660 with clover.
+Amniote, Elton, and Panth share 336 hosts with both gmpd and clover and about 660 with clover. Amniote, Elton, and Panth share 4940 with each other. 997 
 
 
 
