@@ -137,12 +137,13 @@ elton <- read_tsv(here("data", "eltontraits", "MamFuncDat.txt"))
 ```{r}
 elton %<>% mutate(HostCorrectedName = Scientific)
 
-gmpd_elton <- as.data.frame(gmpd_PSR %>% inner_join(elton, by = "HostCorrectedName"))
-
-gmpd_elton %<>% dplyr::select(!c("ForStrat-Comment", "Diet-Source", "Diet-Certainty","ForStrat-Certainty",
+elton %<>% dplyr::select(!c("ForStrat-Comment", "Diet-Source", "Diet-Certainty","ForStrat-Certainty", "ForStrat-Value",
                                  "Activity-Source", "Activity-Certainty", "BodyMass-Source"))
 
-gmpd_elton$`ForStrat-Value` <- as.factor(gmpd_elton$`ForStrat-Value`)
+gmpd_elton <- as.data.frame(gmpd_PSR %>% inner_join(elton, by = "HostCorrectedName"))
+
+
+#gmpd_elton$`ForStrat-Value` <- as.factor(gmpd_elton$`ForStrat-Value`)
 ```
 
 
@@ -158,10 +159,82 @@ summary(elton_brt_5_0.001)
 ```
 
 ```{r}
-gbm.plot(elton_brt_5_0.001, variable.no = 1)
+#gbm.plot(elton_brt_5_0.001, variable.no = 1)
 ```
 
 
 Try again with Elton, Pantheria, Amniote, and CLOVER
 
+```{r}
+amniote <- read_csv(here("data", "amniote", "ECOL_96_269/Data_Files/Amniote_Database_Aug_2015.csv")) #average value from amniote2's ranges
+
+amniote[amniote == -999.00] <- NA
+
+amniote %<>% select(-c(female_body_mass_at_maturity_g))
+
+```
+
+
+```{r}
+amniote %<>% mutate(binomial = tolower(paste(genus, species, sep = " ")))
+elton %<>% mutate(binomial = tolower(Scientific))
+panth %<>% mutate(binomial = tolower(MSW_Binomial))
+
+hosts <- amniote %>% left_join(., elton, by = "binomial")
+hosts %<>% left_join(., panth, by = "binomial")
+```
+
+```{r, message = F}
+mammals <- read_csv(here("data/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
+viruses <- read_csv(here("data/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
+helminths <- read_csv(here("data/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
+bacteria <- read_csv(here("data/clover/CLOVER_1.0_Bacteria_AssociationsFlatFile.csv"))
+
+colnames(mammals) <- gsub("Virus", "Pathogen", colnames(mammals))
+mammals %<>% mutate(PathogenType = "virus")
+
+clover <- rbind(mammals,viruses,bacteria,helminths)
+```
+
+
+
+```{r}
+clover_psr <- clover %>% dplyr::select(Host,Pathogen) %>% 
+                    distinct() %>% 
+                    group_by(Host) %>% 
+                    summarize(psr=n())
+```
+
+```{r}
+clover_psr %<>% mutate(binomial = Host)
+
+hosts_clover_psr <- hosts %>% left_join(., clover_psr, by = "binomial")
+
+full_data <- hosts_clover_psr %>% filter(!is.na(psr))
+```
+
+
+```{r full data partition data}
+train <- sample(1:nrow(full_data), nrow(full_data) / 2)
+test <- full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+full_data_train <- as.data.frame(full_data[train,])
+full_data_test <- as.data.frame(full_data[test,])
+```
+
+
+
+```{r full data initial model}
+brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:35, 40:54, 57:98), gbm.y=101,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+```
+
+```{r}
+summary(brt_full)
+```
+
+```{r}
+#gbm.plot(brt_full)
+```
 
