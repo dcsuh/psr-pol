@@ -230,12 +230,49 @@ plotMissing(gmpd_missing)
 
 
 # How much data do I add from each database
+ - Amniote
+ - AnimalTraits
+ - EltonTraits
+ - HormoneBase
+ - Pantheria
+ - GMPD
 
 Get host names from each database
 ```{r}
+amn_mamm_names <- tolower(unique(paste(amn_mamm$genus, amn_mamm$species, sep = " ")))
+ani_mamm_names <- tolower(unique(ani_mamm$species))
+elton_names <- tolower(unique(elton$Scientific))
+horm_mamm_names <- tolower(unique(horm_mamm$Species))
+panth_names <- tolower(unique(panth1$Binomial))
+gmpd_names <- tolower(unique(gmpd$HostCorrectedName))
+clover_names <- tolower(unique(mammals$Host))
 
+all_host_names <- unique(c(amn_mamm_names, ani_mamm_names, elton_names, horm_mamm_names, panth_names, gmpd_names, clover_names))
+
+names_mat <-
+tibble(all_hosts = all_host_names, 
+       amniote = as.numeric(all_host_names %in% amn_mamm_names),
+       animal_traits = as.numeric(all_host_names %in% ani_mamm_names),
+       elton = as.numeric(all_host_names %in% elton_names),
+       horm = as.numeric(all_host_names %in% horm_mamm_names),
+       panth = as.numeric(all_host_names %in% panth_names),
+       gmpd = as.numeric(all_host_names %in% gmpd_names),
+       clover = as.numeric(all_host_names %in% clover_names))
+
+names_mat %<>%  mutate(host_yes = rowSums(across(c(amniote:panth))),
+                       para_yes = rowSums(across(c(gmpd:clover))))
 ```
 
+```{r}
+library(VennDiagram)
+
+venn.diagram(x = list(amn_mamm_names, ani_mamm_names, elton_names),
+             category.names = c("amniote", "animaltraits", "elton"),
+             filename = "hosts_overlap.png",
+             output=T)
+
+
+```
 
 
 
