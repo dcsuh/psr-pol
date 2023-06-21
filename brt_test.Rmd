@@ -116,6 +116,12 @@ summary(brt3)
 ```{r}
 gbm.plot(brt1, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt2, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt3, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+```
+
+
+```{r}
+gbm.plot(brt2, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt3, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 ```
 
@@ -149,7 +155,7 @@ gmpd_elton <- as.data.frame(gmpd_PSR %>% inner_join(elton, by = "HostCorrectedNa
 
 
 ```{r}
-elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:21, gbm.y= 2,
+elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:20, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.001, bag.fraction = 0.5)
 ```
@@ -194,12 +200,27 @@ colnames(mammals) <- gsub("Virus", "Pathogen", colnames(mammals))
 mammals %<>% mutate(PathogenType = "virus")
 
 clover <- rbind(mammals,viruses,bacteria,helminths)
+clover_micro <- rbind(mammals,viruses,bacteria,helminths)
+clover_helm <- helminths
 ```
 
 
 
 ```{r}
-clover_psr <- clover %>% dplyr::select(Host,Pathogen) %>% 
+clover_psr <- clover %>% filter(HostClass == "mammalia") %>%
+  dplyr::select(Host,Pathogen) %>% 
+                    distinct() %>% 
+                    group_by(Host) %>% 
+                    summarize(psr=n())
+
+clover_micro_psr <- clover_micro %>% filter(HostClass == "mammalia") %>%
+  dplyr::select(Host,Pathogen) %>% 
+                    distinct() %>% 
+                    group_by(Host) %>% 
+                    summarize(psr=n())
+
+clover_macro_psr <- clover_helm %>% filter(HostClass == "mammalia") %>%
+  dplyr::select(Host,Pathogen) %>% 
                     distinct() %>% 
                     group_by(Host) %>% 
                     summarize(psr=n())
@@ -211,6 +232,14 @@ clover_psr %<>% mutate(binomial = Host)
 hosts_clover_psr <- hosts %>% left_join(., clover_psr, by = "binomial")
 
 full_data <- hosts_clover_psr %>% filter(!is.na(psr))
+
+full_data %<>% select(-c(egg_mass_g, 
+                         incubation_d, 
+                         fledging_age_d, 
+                         egg_width_mm, 
+                         egg_length_mm,
+                         fledging_mass_g,
+                         female_svl_at_maturity_cm))
 ```
 
 
@@ -225,7 +254,7 @@ full_data_test <- as.data.frame(full_data[test,])
 
 
 ```{r full data initial model}
-brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:35, 40:54, 57:98), gbm.y=101,
+brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
@@ -235,6 +264,96 @@ summary(brt_full)
 ```
 
 ```{r}
-#gbm.plot(brt_full)
+gbm.plot(brt_full, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt_full, variable.no = 51, plot.layout=c(1,1), write.title = F)
+```
+
+
+```{r}
+clover_micro_psr %<>% mutate(binomial = Host)
+
+hosts_clover_psr <- hosts %>% left_join(., clover_micro_psr, by = "binomial")
+
+full_data <- hosts_clover_psr %>% filter(!is.na(psr))
+
+full_data %<>% select(-c(egg_mass_g, 
+                         incubation_d, 
+                         fledging_age_d, 
+                         egg_width_mm, 
+                         egg_length_mm,
+                         fledging_mass_g,
+                         female_svl_at_maturity_cm))
+```
+
+
+```{r full data partition data}
+train <- sample(1:nrow(full_data), nrow(full_data) / 2)
+test <- full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+full_data_train <- as.data.frame(full_data[train,])
+full_data_test <- as.data.frame(full_data[test,])
+```
+
+
+
+```{r full data initial model}
+brt_full_micro <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+```
+
+```{r}
+summary(brt_full_micro)
+```
+
+```{r}
+gbm.plot(brt_full_micro, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt_full_micro, variable.no = 51, plot.layout=c(1, 1), write.title = FALSE)
+```
+
+
+
+
+```{r}
+clover_macro_psr %<>% mutate(binomial = Host)
+
+hosts_clover_psr <- hosts %>% left_join(., clover_macro_psr, by = "binomial")
+
+full_data <- hosts_clover_psr %>% filter(!is.na(psr))
+
+full_data %<>% select(-c(egg_mass_g, 
+                         incubation_d, 
+                         fledging_age_d, 
+                         egg_width_mm, 
+                         egg_length_mm,
+                         fledging_mass_g,
+                         female_svl_at_maturity_cm))
+```
+
+
+```{r full data partition data}
+train <- sample(1:nrow(full_data), nrow(full_data) / 2)
+test <- full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+full_data_train <- as.data.frame(full_data[train,])
+full_data_test <- as.data.frame(full_data[test,])
+```
+
+
+
+```{r full data initial model}
+brt_full_macro <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+```
+
+```{r}
+summary(brt_full_macro)
+```
+
+
+```{r}
+gbm.plot(brt_full_macro, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt_full_macro, variable.no=51, plot.layout=c(1, 1), write.title = FALSE)
 ```
 
