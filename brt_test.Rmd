@@ -19,13 +19,16 @@ library(here)
 source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
+Read in data. To start, we are focusing on gmpd and pantheria
 
 ```{r read}
 gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
 ```
 
-```{r NAs}
+We need to change these maxed out values (-999) to be NAs isntead. We are also removing some variables if they are all NA or are not informative for our purposes (taxonomy)
+
+```{r panth NAs}
 panth[panth == -999.00] <- NA
 
 colnames(panth) <- gsub("\\d+-\\d+_", "", colnames(panth))
@@ -43,8 +46,9 @@ panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
 panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, References, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, MSW_Order, `GR_MaxLat_dd`, `GR_MinLong_dd`, `WeaningBodyMass_g`)) #too many NAs or just taxon
 ```
 
+Measure PSR from gmpd
 
-```{r psr}
+```{r gmpd psr}
 gmpd_PSR <- gmpd %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
@@ -53,7 +57,7 @@ panth %<>% mutate(HostCorrectedName = MSW_Binomial)
 gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
 ```
 
-
+Prepare data by partitioning
 
 ```{r partition data}
 set.seed(07981)
@@ -64,13 +68,13 @@ gmpd_panth_train <- gmpd_panth[train,]
 gmpd_panth_test <- gmpd_panth[test,]
 ```
 
-```{r}
+```{r gmpd train test datasets}
 gmpd_panth_train <- as.data.frame(gmpd_panth_train)
 gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 ```
 
 
-```{r initial model}
+```{r gmpd initial model}
 brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 4:45, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
@@ -81,7 +85,7 @@ summary(brt1)
 ```
 # Try again by parasite type
 
-```{r}
+```{r gmpd parasite type}
 gmpd_macro <- gmpd %>% filter(ParType %in% c("Arthropod", "Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
@@ -91,14 +95,12 @@ gmpd_micro <- gmpd %>% filter(ParType %in% c("Bacteria", "Protozoa", "Virus")) %
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
   summarize(psr=n())
-```
 
-```{r}
 gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(panth, by="HostCorrectedName"))
 gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorrectedName"))
 ```
 
-```{r}
+```{r macro micro model}
 brt2 <- gbm.step(data = gmpd_panth_macro, gbm.x = 4:45, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
@@ -113,19 +115,19 @@ brt3 <- gbm.step(data = gmpd_panth_micro, gbm.x = 4:45, gbm.y= 2,
 summary(brt2)
 summary(brt3)
 ```
-```{r}
+```{r gmpd pdp}
 gbm.plot(brt1, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt2, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
-gbm.plot(brt3, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+#gbm.plot(brt3, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 ```
 
 
-```{r}
+```{r gmpd pdp2}
 gbm.plot(brt2, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt3, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 ```
 
-```{r}
+```{r gmpd pdp3}
 gbm.plot(brt1, variable.no = 17)
 gbm.plot(brt2, variable.no = 17)
 ```
@@ -136,11 +138,12 @@ gbm.plot(brt2, variable.no = 17)
 # Try with EltonTraits instead of Pantheria
 
 
-```{r}
+```{r elton}
 elton <- read_tsv(here("data", "eltontraits", "MamFuncDat.txt"))
 ```
+Prepare eltontraits data
 
-```{r}
+```{r elton rename}
 elton %<>% mutate(HostCorrectedName = Scientific)
 
 elton %<>% dplyr::select(!c("ForStrat-Comment", "Diet-Source", "Diet-Certainty","ForStrat-Certainty", "ForStrat-Value",
@@ -153,8 +156,9 @@ gmpd_elton <- as.data.frame(gmpd_PSR %>% inner_join(elton, by = "HostCorrectedNa
 ```
 
 
+Try the model with gmpd and eltontraits instead of pantheria
 
-```{r}
+```{r gmpd elton model}
 elton_brt_5_0.001 <- gbm.step(data = gmpd_elton, gbm.x = 6:20, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.001, bag.fraction = 0.5)
@@ -169,9 +173,11 @@ summary(elton_brt_5_0.001)
 ```
 
 
+# CLOVER
+
 Try again with Elton, Pantheria, Amniote, and CLOVER
 
-```{r}
+```{r joined datasets}
 amniote <- read_csv(here("data", "amniote", "ECOL_96_269/Data_Files/Amniote_Database_Aug_2015.csv")) #average value from amniote2's ranges
 
 amniote[amniote == -999.00] <- NA
@@ -181,7 +187,7 @@ amniote %<>% select(-c(female_body_mass_at_maturity_g))
 ```
 
 
-```{r}
+```{r fix names}
 amniote %<>% mutate(binomial = tolower(paste(genus, species, sep = " ")))
 elton %<>% mutate(binomial = tolower(Scientific))
 panth %<>% mutate(binomial = tolower(MSW_Binomial))
@@ -190,7 +196,7 @@ hosts <- amniote %>% left_join(., elton, by = "binomial")
 hosts %<>% left_join(., panth, by = "binomial")
 ```
 
-```{r, message = F}
+```{r read datasets, message = F}
 mammals <- read_csv(here("data/clover/CLOVER_0.1_MammalViruses_AssociationsFlatFile.csv"))
 viruses <- read_csv(here("data/clover/CLOVER_1.0_Viruses_AssociationsFlatFile.csv"))
 helminths <- read_csv(here("data/clover/CLOVER_1.0_HelminthProtozoaFungi_AssociationsFlatFile.csv"))
@@ -206,7 +212,7 @@ clover_helm <- helminths
 
 
 
-```{r}
+```{r clover psr}
 clover_psr <- clover %>% filter(HostClass == "mammalia") %>%
   dplyr::select(Host,Pathogen) %>% 
                     distinct() %>% 
@@ -226,7 +232,7 @@ clover_macro_psr <- clover_helm %>% filter(HostClass == "mammalia") %>%
                     summarize(psr=n())
 ```
 
-```{r}
+```{r make full data}
 clover_psr %<>% mutate(binomial = Host)
 
 hosts_clover_psr <- hosts %>% left_join(., clover_psr, by = "binomial")
@@ -239,7 +245,8 @@ full_data %<>% select(-c(egg_mass_g,
                          egg_width_mm, 
                          egg_length_mm,
                          fledging_mass_g,
-                         female_svl_at_maturity_cm))
+                         female_svl_at_maturity_cm,
+                         female_svl_cm))
 ```
 
 
@@ -254,7 +261,7 @@ full_data_test <- as.data.frame(full_data[test,])
 
 
 ```{r full data initial model}
-brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
+brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:27, 33:46, 50:90), gbm.y=93,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
@@ -286,7 +293,7 @@ full_data %<>% select(-c(egg_mass_g,
 ```
 
 
-```{r full data partition data}
+```{r full micro data partition data}
 train <- sample(1:nrow(full_data), nrow(full_data) / 2)
 test <- full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
 test <- as.integer(test$row_num)
@@ -296,7 +303,7 @@ full_data_test <- as.data.frame(full_data[test,])
 
 
 
-```{r full data initial model}
+```{r full micro data initial model}
 brt_full_micro <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
@@ -314,7 +321,7 @@ gbm.plot(brt_full_micro, variable.no = 51, plot.layout=c(1, 1), write.title = FA
 
 
 
-```{r}
+```{r clover macro psr}
 clover_macro_psr %<>% mutate(binomial = Host)
 
 hosts_clover_psr <- hosts %>% left_join(., clover_macro_psr, by = "binomial")
@@ -331,7 +338,7 @@ full_data %<>% select(-c(egg_mass_g,
 ```
 
 
-```{r full data partition data}
+```{r macro data partition data}
 train <- sample(1:nrow(full_data), nrow(full_data) / 2)
 test <- full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
 test <- as.integer(test$row_num)
@@ -341,7 +348,7 @@ full_data_test <- as.data.frame(full_data[test,])
 
 
 
-```{r full data initial model}
+```{r macro data initial model}
 brt_full_macro <- gbm.step(data = full_data_train, gbm.x = c(8:28, 34:47, 51:91), gbm.y=94,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
@@ -358,5 +365,48 @@ gbm.plot(brt_full_macro, variable.no=51, plot.layout=c(1, 1), write.title = FALS
 ```
 
 
+# GMPD with more life history data
+
+Do the same thing we just did with CLOVER but with GMPD only
+
+```{r}
+gmpd_PSR %<>% mutate(binomial = tolower(HostCorrectedName))
+gmpd_full <- hosts %>% left_join(., gmpd_PSR)
 
 
+gmpd_full_data <- gmpd_full %>% filter(!is.na(psr))
+
+gmpd_full_data %<>% select(-c(egg_mass_g, 
+                         incubation_d, 
+                         fledging_age_d, 
+                         egg_width_mm, 
+                         egg_length_mm,
+                         fledging_mass_g,
+                         female_svl_at_maturity_cm,
+                         female_svl_cm))
+```
+
+```{r full data partition data}
+train <- sample(1:nrow(gmpd_full_data), nrow(gmpd_full_data) / 2)
+test <- gmpd_full_data %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+full_data_train <- as.data.frame(gmpd_full_data[train,])
+full_data_test <- as.data.frame(gmpd_full_data[test,])
+```
+
+
+
+```{r full data initial model}
+brt_full <- gbm.step(data = full_data_train, gbm.x = c(8:27, 33:46, 50:90), gbm.y=93,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.004, bag.fraction = 0.5)
+```
+
+```{r}
+summary(brt_full)
+```
+
+```{r}
+gbm.plot(brt_full, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt_full, variable.no = 50, plot.layout=c(1,1), write.title = F)
+```
