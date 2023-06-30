@@ -46,6 +46,17 @@ panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
 panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, References, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, MSW_Order, `GR_MaxLat_dd`, `GR_MinLong_dd`, `WeaningBodyMass_g`)) #too many NAs or just taxon
 ```
 
+
+```{r categorize variables}
+
+```
+
+
+```{r make taxa dummy variables}
+
+```
+
+
 Measure PSR from gmpd
 
 ```{r gmpd psr}
