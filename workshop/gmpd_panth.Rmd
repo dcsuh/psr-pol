@@ -94,30 +94,15 @@ brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 4:45, gbm.y= 2,
 ```{r}
 summary(brt1)
 ```
-# Try again by parasite type
 
-# ```{r gmpd parasite type}
-# gmpd_macro <- gmpd %>% filter(ParType %in% c("Arthropod", "Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-#   distinct() %>% 
-#   group_by(HostCorrectedName) %>% 
-#   summarize(psr=n())
-# 
-# gmpd_micro <- gmpd %>% filter(ParType %in% c("Bacteria", "Protozoa", "Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-#   distinct() %>% 
-#   group_by(HostCorrectedName) %>% 
-#   summarize(psr=n())
-# 
-# gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(panth, by="HostCorrectedName"))
-# gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorrectedName"))
-# ```
 
 ```{r gmpd parasite type}
-gmpd_macro <- gmpd %>% filter(ParType %in% c("Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+gmpd_macro <- gmpd %>% filter(ParType %in% c("Arthropod", "Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
   summarize(psr=n())
 
-gmpd_micro <- gmpd %>% filter(ParType %in% c("Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+gmpd_micro <- gmpd %>% filter(ParType %in% c("Bacteria", "Protozoa", "Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
   summarize(psr=n())
