@@ -90,7 +90,7 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 ```
 
 
-```{r gmpd initial model}
+```{r gmpd initial model, warning = F}
 brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 5:75, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
@@ -116,7 +116,7 @@ gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(panth, by="HostCorre
 gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorrectedName"))
 ```
 
-```{r macro micro model}
+```{r macro micro model, warning=F}
 brt2 <- gbm.step(data = gmpd_panth_macro, gbm.x = 5:75, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
