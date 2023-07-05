@@ -10,3 +10,5 @@ links to some works in progress:
 [database](/workshop/databases.html)
 
 [BRT](/brt_test.html)
+
+[gmpd_panth](/workshop/gmpd_panth.html)
