@@ -16,6 +16,8 @@ library(tidyverse)
 library(magrittr)
 library(here)
 
+library(caret)
+
 source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
@@ -43,17 +45,20 @@ panth$`HabitatBreadth` <- as.factor(panth$`HabitatBreadth`)
 panth$`Terrestriality` <- as.factor(panth$`Terrestriality`)
 panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
 
-panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, References, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, MSW_Order, `GR_MaxLat_dd`, `GR_MinLong_dd`, `WeaningBodyMass_g`)) #too many NAs or just taxon
+panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, References, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, `GR_MaxLat_dd`, `GR_MinLong_dd`, `WeaningBodyMass_g`)) #too many NAs or just taxon
 ```
 
 
 ```{r categorize variables}
 
+
 ```
 
 
 ```{r make taxa dummy variables}
-
+dummy_panth <- dummyVars(~ MSW_Order, data = panth)
+panth_updated <- as_tibble(predict(dummy_panth, newdata = panth))
+panth <- cbind(panth, panth_updated)
 ```
 
 
@@ -86,7 +91,7 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 
 
 ```{r gmpd initial model}
-brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 4:45, gbm.y= 2,
+brt1 <- gbm.step(data = gmpd_panth_train, gbm.x = 5:75, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
@@ -112,11 +117,11 @@ gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorre
 ```
 
 ```{r macro micro model}
-brt2 <- gbm.step(data = gmpd_panth_macro, gbm.x = 4:45, gbm.y= 2,
+brt2 <- gbm.step(data = gmpd_panth_macro, gbm.x = 5:75, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 
-brt3 <- gbm.step(data = gmpd_panth_micro, gbm.x = 4:45, gbm.y= 2,
+brt3 <- gbm.step(data = gmpd_panth_micro, gbm.x = 5:75, gbm.y= 2,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 
@@ -128,17 +133,14 @@ summary(brt3)
 ```
 ```{r gmpd pdp}
 gbm.plot(brt1, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
-gbm.plot(brt2, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
+#gbm.plot(brt2, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 #gbm.plot(brt3, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 ```
 
 
 ```{r gmpd pdp2}
+gbm.plot(brt1, variable.no = 17)
 gbm.plot(brt2, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt3, variable.no = 17, plot.layout=c(2, 3), write.title = FALSE)
 ```
 
-```{r gmpd pdp3}
-gbm.plot(brt1, variable.no = 17)
-gbm.plot(brt2, variable.no = 17)
-```

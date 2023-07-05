@@ -274,7 +274,7 @@ plot.gbm(boost_gmpd_v, i.var=12)
 plot.gbm(boost_gmpd_h, i.var=12)
 ```
 
-```{r}
+```{r full model results}
 inv <- pdp::partial(boost_gmpd, n.trees=5000, "MaxLongevitym")
 
 plot1 <- inv %>%
@@ -298,7 +298,8 @@ plot2 <- gmpd_panth %>%
   scale_y_continuous(position = "right")+
   ylab("") +
   theme_minimal() +
-  theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
+  theme(axis.title.x = element_blank(),axis.text=element_text(size=12)) 
+  # labs(title = "full model")
 #theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
 
 
@@ -307,10 +308,10 @@ p2 <- add_sub(plot2,"MaxLongevity",size=12)
 p.maxLong<-ggdraw() +
   draw_plot(p2,x=0.05,scale=0.95) +
   draw_plot(p1,x=-0.04,scale=0.975,y=0.05)
-p.maxLong
+p.maxLong  + labs(title = "full model")
 ```
 
-```{r}
+```{r microparasite model results}
 inv <- pdp::partial(boost_gmpd_v, n.trees=5000, "MaxLongevitym")
 
 plot1 <- inv %>%
@@ -342,11 +343,11 @@ p1 <- add_sub(plot1," ")
 p2 <- add_sub(plot2,"MaxLongevity",size=12)
 p.maxLong<-ggdraw() +
   draw_plot(p2,x=0.05,scale=0.95) +
-  draw_plot(p1,x=-0.04,scale=0.975,y=0.05)
-p.maxLong
+  draw_plot(p1,x=-0.04,scale=0.975, y = 0.05)
+p.maxLong + labs(title = "microparasite model")
 ```
 
-```{r}
+```{r macroparasite model results}
 inv <- pdp::partial(boost_gmpd_h, n.trees=5000, "MaxLongevitym")
 
 plot1 <- inv %>%
@@ -379,7 +380,7 @@ p2 <- add_sub(plot2,"MaxLongevity",size=12)
 p.maxLong<-ggdraw() +
   draw_plot(p2,x=0.05,scale=0.95) +
   draw_plot(p1,x=-0.04,scale=0.975,y=0.05)
-p.maxLong
+p.maxLong + labs(title = "macroparasite model")
 ```
 
 
