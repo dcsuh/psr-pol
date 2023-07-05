@@ -26,7 +26,7 @@ gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
 ```
 
-We need to change these maxed out values (-999) to be NAs isntead. We are also removing some variables if they are all NA or are not informative for our purposes (taxonomy)
+We need to change these maxed out values (-999) to be NAs instead. We are also removing some variables if they are all NA or are not informative for our purposes (taxonomy)
 
 ```{r panth NAs}
 panth[panth == -999.00] <- NA

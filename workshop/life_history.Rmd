@@ -73,6 +73,7 @@ Not totally sure what is difference between panth1 and panth2 but panth1 has mor
 Not sure what some of the final variables for panth really mean so we'll just exclude them for now
 ```{r}
 panth1 %<>% dplyr::select(MSW05_Order:`5-7_WeaningBodyMass_g_EXT`)
+panth1$ref_count <- str_count(panth1$References, ";")
 ```
 
 
@@ -173,7 +174,7 @@ things to do:
  - subset analysis by host or parasite type
  
 ```{r}
-gmpd_VSR <- gmpd %>% filter(ParType == "Virus") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
+gmpd_VSR <- gmpd %>% filter(ParType %in% c("Virus", "Bacteria", "Protozoa")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
   group_by(HostCorrectedName) %>% summarize(vsr=n())
 gmpd_panth_v <- gmpd_VSR %>% inner_join(panth1, by="HostCorrectedName")
 ```
@@ -216,7 +217,7 @@ sqrt(mean((yhat_boost_v-boost_gmpd_v$data$y)^2))
 Now again with helminths!
  
 ```{r}
-gmpd_HSR <- gmpd %>% filter(ParType == "Helminth") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
+gmpd_HSR <- gmpd %>% filter(ParType %in% c("Helminth", "Arthropod")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% distinct() %>% 
   group_by(HostCorrectedName) %>% summarize(hsr=n())
 gmpd_panth_h <- gmpd_HSR %>% inner_join(panth1, by="HostCorrectedName")
 ```
