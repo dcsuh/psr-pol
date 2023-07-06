@@ -7,7 +7,7 @@ output: html_document
 
 # Important note
 
-Functions from brt.functions.R require data to be in "data.frame" format. Make sure to reclass any data using as.data.frame() before running gbm.step
+Make sure to reclass any data using as.data.frame() before running gbm.step
 
 
 
@@ -16,9 +16,11 @@ library(tidyverse)
 library(magrittr)
 library(here)
 
+library(dismo)
 library(caret)
+library(gbm)
 
-source(here("previous work", "elith_tutorial", "brt.functions.R"))
+#source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
 Read in data. To start, we are focusing on gmpd and pantheria
@@ -35,6 +37,7 @@ panth[panth == -999.00] <- NA
 
 colnames(panth) <- gsub("\\d+-\\d+_", "", colnames(panth))
 colnames(panth) <- gsub("*\\d+", "", colnames(panth))
+colnames(panth) <- gsub("/", "_", colnames(panth))
 
 
 panth$ref_count <- str_count(panth$References, ";")
@@ -73,14 +76,14 @@ gmpd_PSR <- gmpd %>% filter(ParType %in% c("Arthropod", "Helminth", "Bacteria", 
 gmpd_PSR %<>% inner_join(., gmpd_dummy_vars)
 panth %<>% mutate(HostCorrectedName = MSW_Binomial)
 gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
-gmpd_panth %<>% select(-c(MSW_Order, MSW_Binomial))
+gmpd_panth %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 ```
 
 Prepare data by partitioning
 
 ```{r partition data}
 set.seed(07981)
-train <- sample(1:nrow(gmpd_panth), nrow(gmpd_panth) / 2)
+train <- sample(1:nrow(gmpd_panth), nrow(gmpd_panth)*0.8)
 test <- gmpd_panth %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
 test <- as.integer(test$row_num)
 gmpd_panth_train <- gmpd_panth[train,]
@@ -94,7 +97,7 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 
 
 ```{r gmpd initial model, warning = F}
-brt1_elith_full <- gbm.step(data = gmpd_panth_train, gbm.x = 3:48, gbm.y= 2,
+brt1_elith_full <- gbm.step(data = gmpd_panth_train, gbm.x = 2:47, gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
@@ -133,10 +136,10 @@ sum(!gmpd_panth_macro$MSW_Binomial %in% gmpd_panth_micro$MSW_Binomial) #check.
 
 
 ```{r}
-gmpd_panth_micro %<>% select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
-gmpd_panth_macro %<>% select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_micro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_macro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_macro), nrow(gmpd_panth_macro) / 2)
+train <- sample(1:nrow(gmpd_panth_macro), nrow(gmpd_panth_macro) * 0.8)
 test <- gmpd_panth_macro %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
 test <- as.integer(test$row_num)
 gmpd_panth_macro_train <- gmpd_panth_macro[train,]
@@ -164,7 +167,7 @@ summary(brt2_elith_macro)
 summary(brt3_elith_micro)
 ```
 ```{r gmpd pdp}
-#gbm.plot(brt1_elith_full, n.plots=5,plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt1_elith_full, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt2_elith_macro, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt3_elith_micro, n.plots=5, plot.layout=c(2, 3), write.title = FALSE)
 ```
@@ -178,16 +181,21 @@ gbm.plot(brt3_elith_micro, variable.no = 17, plot.layout=c(1, 1), write.title = 
 
 Becker and Han Method
 ```{r}
+brt1_other_full <- gbm(psr ~ ., data = gmpd_panth_train,
+                 distribution = "poisson", n.trees = 1600,
+                 interaction.depth = 5, shrinkage = 0.004)
+
 brt2_other_macro <- gbm(psr ~ ., data = gmpd_panth_macro_train,
-                 distribution = "poisson", n.trees = 2000,
-                 interaction.depth = 4)
+                 distribution = "poisson", n.trees = 3300,
+                 interaction.depth = 5, shrinkage = 0.001)
 
 brt3_other_micro <- gbm(psr ~ ., data = gmpd_panth_micro_train,
-                 distribution = "poisson", n.trees = 2000,
-                 interaction.depth = 4)
+                 distribution = "poisson", n.trees = 4950,
+                 interaction.depth = 5, shrinkage = 0.001)
 ```
 
 ```{r}
+summary(brt1_other_full)
 summary(brt2_other_macro)
 summary(brt3_other_micro)
 ```
