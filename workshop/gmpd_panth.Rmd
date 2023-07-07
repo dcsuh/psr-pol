@@ -189,9 +189,9 @@ summary(brt2_elith_macro)
 summary(brt3_elith_micro)
 ```
 ```{r gmpd pdp 6}
-gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T)
-gbm.plot(brt2_elith_macro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE)
-gbm.plot(brt3_elith_micro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
+gbm.plot(brt2_elith_macro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "macro")
+gbm.plot(brt3_elith_micro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "micro")
 ```
 
 ```{r gmpd pdp 15}
@@ -208,23 +208,23 @@ brt2_names <- brt2_elith_macro$var.names
 brt1_long_plot_no <- which(brt1_names %in% c("MaxLongevity_m"))
 brt2_long_plot_no <- which(brt2_names %in% c("MaxLongevity_m"))
 
-gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE)
-gbm.plot(brt2_elith_macro, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE)
-gbm.plot(brt3_elith_micro, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE)
+gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "full")
+gbm.plot(brt2_elith_macro, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "macro")
+gbm.plot(brt3_elith_micro, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "micro")
 ```
 
 Becker and Han Method
 ```{r}
 brt1_other_full <- gbm(psr ~ ., data = gmpd_panth_train,
-                 distribution = "poisson", n.trees = 1600,
+                 distribution = "poisson", n.trees = brt1_elith_full$n.trees,
                  interaction.depth = 5, shrinkage = 0.004)
 
 brt2_other_macro <- gbm(psr ~ ., data = gmpd_panth_macro_train,
-                 distribution = "poisson", n.trees = 3300,
+                 distribution = "poisson", n.trees = brt2_elith_macro$n.trees,
                  interaction.depth = 5, shrinkage = 0.001)
 
 brt3_other_micro <- gbm(psr ~ ., data = gmpd_panth_micro_train,
-                 distribution = "poisson", n.trees = 4950,
+                 distribution = "poisson", n.trees = brt3_elith_micro$n.trees,
                  interaction.depth = 5, shrinkage = 0.001)
 ```
 
