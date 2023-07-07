@@ -240,6 +240,18 @@ summary(brt3_other_micro)
 
 Prediction. Mean Squared Error and Root Mean Square Deviation
 ```{r}
+brt1_full_test_pred <- predict(brt1_elith_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
+mean((brt1_full_test_pred-gmpd_panth_test$psr)^2)
+sqrt(mean((brt1_full_test_pred-gmpd_panth_test$psr)^2))
+```
+
+```{r}
+brt1_full_test_pred_other <- predict(brt1_other_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
+mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2)
+sqrt(mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2))
+```
+
+```{r}
 brt2_macro_test_pred <- predict(brt2_elith_macro, newdata = gmpd_panth_macro_test, n.trees = brt2_elith_macro$n.trees)
 mean((brt2_macro_test_pred-gmpd_panth_macro_test$psr)^2)
 sqrt(mean((brt2_macro_test_pred-gmpd_panth_macro_test$psr)^2))
