@@ -238,7 +238,7 @@ summary(brt3_other_micro)
 
 
 
-Prediction
+Prediction. Mean Squared Error and Root Mean Square Deviation
 ```{r}
 brt2_macro_test_pred <- predict(brt2_elith_macro, newdata = gmpd_panth_macro_test, n.trees = brt2_elith_macro$n.trees)
 mean((brt2_macro_test_pred-gmpd_panth_macro_test$psr)^2)
