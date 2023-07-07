@@ -109,7 +109,7 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 
 brt1_elith_full <- gbm.step(data = gmpd_panth_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
+                 learning.rate = 0.003, bag.fraction = 0.5)
 ```
 
 ```{r}
@@ -189,7 +189,7 @@ summary(brt2_elith_macro)
 summary(brt3_elith_micro)
 ```
 ```{r gmpd pdp 6}
-gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE)
+gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T)
 gbm.plot(brt2_elith_macro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE)
 gbm.plot(brt3_elith_micro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE)
 ```
@@ -236,27 +236,29 @@ summary(brt3_other_micro)
 
 
 
+
+
 Prediction
 ```{r}
-brt2_macro_test_pred <- predict(brt2_elith_macro, newdata = gmpd_panth_macro_test, n.trees = 5000)
-mean((brt2_macro_test_pred-brt2_elith_macro$data$y)^2)
-sqrt(mean((brt2_macro_test_pred-brt2_elith_macro$data$y)^2))
+brt2_macro_test_pred <- predict(brt2_elith_macro, newdata = gmpd_panth_macro_test, n.trees = brt2_elith_macro$n.trees)
+mean((brt2_macro_test_pred-gmpd_panth_macro_test$psr)^2)
+sqrt(mean((brt2_macro_test_pred-gmpd_panth_macro_test$psr)^2))
 ```
 
 ```{r}
-brt2_macro_test_pred_other <- predict(brt2_other_macro, newdata = gmpd_panth_macro_test, n.trees = 5000)
-mean((brt2_macro_test_pred_other-brt2_other_macro$data$y)^2)
-sqrt(mean((brt2_macro_test_pred_other-brt2_other_macro$data$y)^2))
+brt2_macro_test_pred_other <- predict(brt2_other_macro, newdata = gmpd_panth_macro_test, n.trees = brt2_other_macro$n.trees)
+mean((brt2_macro_test_pred_other-gmpd_panth_macro_test$psr)^2)
+sqrt(mean((brt2_macro_test_pred_other-gmpd_panth_macro_test$psr)^2))
 ```
 
 ```{r}
-brt3_micro_test_pred <- predict(brt3_elith_micro, newdata = gmpd_panth_micro_test, n.trees = 5000)
-mean((brt3_micro_test_pred-brt3_elith_micro$data$y)^2)
-sqrt(mean((brt3_micro_test_pred-brt3_elith_micro$data$y)^2))
+brt3_micro_test_pred <- predict(brt3_elith_micro, newdata = gmpd_panth_micro_test, n.trees = brt3_elith_micro$n.trees)
+mean((brt3_micro_test_pred-gmpd_panth_micro_test$psr)^2)
+sqrt(mean((brt3_micro_test_pred-gmpd_panth_micro_test$psr)^2))
 ```
 
 ```{r}
-brt3_micro_test_pred_other <- predict(brt3_other_micro, newdata = gmpd_panth_micro_test, n.trees = 5000)
-mean((brt3_micro_test_pred_other-brt3_other_micro$data$y)^2)
-sqrt(mean((brt3_micro_test_pred_other-brt3_other_micro$data$y)^2))
+brt3_micro_test_pred_other <- predict(brt3_other_micro, newdata = gmpd_panth_micro_test, n.trees = brt3_other_micro$n.trees)
+mean((brt3_micro_test_pred_other-gmpd_panth_micro_test$psr)^2)
+sqrt(mean((brt3_micro_test_pred_other-gmpd_panth_micro_test$psr)^2))
 ```
