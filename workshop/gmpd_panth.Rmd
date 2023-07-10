@@ -228,14 +228,14 @@ brt2_elith_helm <- gbm.step(data = gmpd_panth_helm_train, gbm.x = 2:ncol(gmpd_pa
 ```{r virus model, warning=F}
 brt3_elith_virus <- gbm.step(data = gmpd_panth_virus_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.002, bag.fraction = 0.5)
+                 learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 
 ```{r arthropod model, warning=F}
 brt4_elith_arth <- gbm.step(data = gmpd_panth_arth_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.003, bag.fraction = 0.5)
+                 learning.rate = 0.002, bag.fraction = 0.5)
 ```
 
 
