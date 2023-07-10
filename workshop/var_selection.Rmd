@@ -1,0 +1,72 @@
+---
+title: "Variable Selection"
+author: "Daniel Suh"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(here)
+library(tidyverse)
+library(magrittr)
+```
+
+Read in data. To start, we are focusing on gmpd and pantheria
+
+```{r read}
+gmpd <- read_csv(here("data/GMPD_main.csv"))
+panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
+var_type <- read_csv(here("data/var_type.csv"))
+```
+
+We need to change these maxed out values (-999) to be NAs instead. We are also removing some variables if they are all NA or are not informative for our purposes (taxonomy)
+
+```{r panth NAs}
+panth[panth == -999.00] <- NA
+
+colnames(panth) <- gsub("\\d+-\\d+_", "", colnames(panth))
+colnames(panth) <- gsub("*\\d+", "", colnames(panth))
+colnames(panth) <- gsub("/", "_", colnames(panth))
+
+
+panth$ref_count <- str_count(panth$References, ";")
+
+panth$`ActivityCycle` <- as.factor(panth$`ActivityCycle`)
+panth$`DietBreadth` <- as.factor(panth$`DietBreadth`)
+panth$`HabitatBreadth` <- as.factor(panth$`HabitatBreadth`)
+panth$`Terrestriality` <- as.factor(panth$`Terrestriality`)
+panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
+
+#panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, `WeaningBodyMass_g`)) #too many NAs or just taxon
+
+panth %<>% dplyr::select(!c(MSW_Species, MSW_Genus, MSW_Family))
+
+panth %<>% dplyr::select(!c(References, ))
+
+
+env_vars <- var_type %>% filter(var_type %in% c("environment"))
+env_vars <- env_vars$variable
+anthro_vars <- var_type %>% filter(var_type %in% c("anthropogenic"))
+anthro_vars <- anthro_vars$variable
+metabolic_vars <- var_type %>% filter(var_type %in% c("metabolic"))
+metabolic_vars <- metabolic_vars$variable
+morph_vars <- var_type %>% filter(var_type %in% c("morphology"))
+morph_vars <- morph_vars$variable
+behavior_vars <- var_type %>% filter(var_type %in% c("behavior"))
+behavior_vars <- behavior_vars$variable
+
+env_panth <- panth %>% select(env_vars)
+anthro_panth <- panth %>% select(anthro_vars)
+metabolic_panth <- panth %>% select(metabolic_vars)
+morph_panth <- panth %>% select(morph_vars)
+behavior_panth <- panth %>% select(behavior_vars)
+```
+
+```{r}
+pairs(env_panth)
+pairs(anthro_panth)
+pairs(metabolic_panth)
+pairs(morph_panth)
+pairs(behavior_panth)
+```
+
