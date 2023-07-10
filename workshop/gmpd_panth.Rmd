@@ -27,43 +27,7 @@ Read in data. To start, we are focusing on gmpd and pantheria
 
 ```{r read}
 gmpd <- read_csv(here("data/GMPD_main.csv"))
-panth <- read_tsv(here("data/pantheria/ECOL_90_184/PanTHERIA_1-0_WR05_Aug2008.txt"))
-var_type <- read_csv(here("data/var_type.csv"))
-```
-
-We need to change these maxed out values (-999) to be NAs instead. We are also removing some variables if they are all NA or are not informative for our purposes (taxonomy)
-
-```{r panth NAs}
-panth[panth == -999.00] <- NA
-
-colnames(panth) <- gsub("\\d+-\\d+_", "", colnames(panth))
-colnames(panth) <- gsub("*\\d+", "", colnames(panth))
-colnames(panth) <- gsub("/", "_", colnames(panth))
-
-
-panth$ref_count <- str_count(panth$References, ";")
-
-panth$`ActivityCycle` <- as.factor(panth$`ActivityCycle`)
-panth$`DietBreadth` <- as.factor(panth$`DietBreadth`)
-panth$`HabitatBreadth` <- as.factor(panth$`HabitatBreadth`)
-panth$`Terrestriality` <- as.factor(panth$`Terrestriality`)
-panth$`TrophicLevel` <- as.factor(panth$`TrophicLevel`)
-
-# panth %<>% dplyr::select(!c(`WeaningHeadBodyLen_mm`, `AdultForearmLen_mm`, `AdultBodyMass_g_EXT`, `NeonateBodyMass_g_EXT`, `WeaningBodyMass_g_EXT`, MSW_Species, MSW_Genus, MSW_Family, `WeaningBodyMass_g`)) #too many NAs or just taxon
-
-panth %<>% dplyr::select(!c(MSW_Species, MSW_Genus, MSW_Family))
-
-env_vars <- var_type %>% filter(var_type %in% c("environment", "anthropogenic", "other", "metabolic", "behavior", "morphology"))
-env_vars <- env_vars$variable
-
-
-panth %<>% dplyr::select(!env_vars)
-```
-
-
-```{r categorize variables}
-
-
+panth <- read_tsv(here("data/panth_subset.csv"))
 ```
 
 
