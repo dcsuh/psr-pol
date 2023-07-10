@@ -81,7 +81,7 @@ summary(brt1_elith_full)
 ```
 
 
-```{r gmpd helminth}
+```{r helminth}
 gmpd_helm <- gmpd %>% filter(ParType %in% c("Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
@@ -99,7 +99,7 @@ gmpd_arth <- gmpd %>% filter(ParType %in% c("Arthropod")) %>% dplyr::select(Host
 gmpd_arth %<>% inner_join(., gmpd_dummy_vars)
 ```
 
-```{r gmpd virus}
+```{r virus}
 gmpd_virus <- gmpd %>% filter(ParType %in% c("Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
@@ -141,12 +141,19 @@ gmpd_panth_proto <- as.data.frame(gmpd_proto %>% inner_join(panth, by="HostCorre
 Use only hosts that overlap between gmpd_panth_macro and gmpd_panth_micro
 ```{r}
 gmpd_panth_helm_hosts <- gmpd_panth_helm$MSW_Binomial #get all host species from macro database
-gmpd_panth_virus %<>% filter(MSW_Binomial %in% gmpd_panth_helm_hosts) #choose host species from macro that are also in micro
 gmpd_panth_virus_hosts <- gmpd_panth_virus$MSW_Binomial #get remaining host species from micro database
-gmpd_panth_helm %<>% filter(MSW_Binomial %in% gmpd_panth_virus_hosts) #make sure these are also in macro database
+gmpd_panth_arth_hosts <- gmpd_panth_arth$MSW_Binomial
+gmpd_panth_bact_hosts <- gmpd_panth_bact$MSW_Binomial
+gmpd_panth_proto_hosts <- gmpd_panth_proto$MSW_Binomial
 
+intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
 
-sum(!gmpd_panth_macro$MSW_Binomial %in% gmpd_panth_micro$MSW_Binomial) #check.
+gmpd_panth_helm %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_virus %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_arth %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_bact %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_proto %<>% filter(MSW_Binomial %in% intersect_hosts)
+
 ```
 
 
@@ -165,7 +172,7 @@ gmpd_panth_helm_test <- gmpd_panth_helm[test,]
 gmpd_panth_arth %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
 train <- sample(1:nrow(gmpd_panth_arth), nrow(gmpd_panth_arth) * 0.8)
-test <- gmpd_panth_ath %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- gmpd_panth_arth %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
 test <- as.integer(test$row_num)
 gmpd_panth_arth_train <- gmpd_panth_arth[train,]
 gmpd_panth_arth_test <- gmpd_panth_arth[test,]
@@ -214,14 +221,14 @@ Elith method
 
 brt2_elith_helm <- gbm.step(data = gmpd_panth_helm_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.003, bag.fraction = 0.5)
+                 learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 
 ```{r virus model, warning=F}
 brt3_elith_virus <- gbm.step(data = gmpd_panth_virus_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.003, bag.fraction = 0.5)
+                 learning.rate = 0.002, bag.fraction = 0.5)
 ```
 
 
@@ -235,23 +242,23 @@ brt4_elith_arth <- gbm.step(data = gmpd_panth_arth_train, gbm.x = 2:ncol(gmpd_pa
 ```{r bacteria model, warning=F}
 brt5_elith_bact <- gbm.step(data = gmpd_panth_bact_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.003, bag.fraction = 0.5)
+                 learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 
 ```{r protozoa model, warning=F}
 brt6_elith_proto <- gbm.step(data = gmpd_panth_proto_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.003, bag.fraction = 0.5)
+                 learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 ```{r}
+summary(brt1_elith_full)
 summary(brt2_elith_helm)
 summary(brt3_elith_virus)
 summary(brt4_elith_arth)
 summary(brt5_elith_bact)
 summary(brt6_elith_proto)
-
 ```
 ```{r gmpd pdp 6}
 gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
@@ -312,8 +319,11 @@ summary(brt3_other_virus)
 ```{r}
 get_mse <- function(model, test) {
   pred <- predict(model, newdata = test, n.trees = model$n.trees)
-  mean((pred - test$psr)^2)
-  sqrt(mean((pred-test$psr)^2))
+  MSE <- mean((pred - test$psr)^2)
+  RMSD <- sqrt(mean((pred-test$psr)^2))
+  name <- print(substitute(model))
+  print(paste("Mean Squared Error for", name,"= ", MSE))
+  print(paste("Root Mean Square Deviation for", name, " = ", RMSD))
 }
 ```
 
