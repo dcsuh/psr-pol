@@ -55,11 +55,11 @@ morph_vars <- morph_vars$variable
 behavior_vars <- var_type %>% filter(var_type %in% c("behavior"))
 behavior_vars <- behavior_vars$variable
 
-env_panth <- panth %>% select(env_vars)
-anthro_panth <- panth %>% select(anthro_vars)
-metabolic_panth <- panth %>% select(metabolic_vars)
-morph_panth <- panth %>% select(morph_vars)
-behavior_panth <- panth %>% select(behavior_vars)
+env_panth <- panth %>% dplyr::select(env_vars)
+anthro_panth <- panth %>% dplyr::select(anthro_vars)
+metabolic_panth <- panth %>% dplyr::select(metabolic_vars)
+morph_panth <- panth %>% dplyr::select(morph_vars)
+behavior_panth <- panth %>% dplyr::select(behavior_vars)
 ```
 
 ```{r}
@@ -71,10 +71,11 @@ pairs(behavior_panth)
 ```
 
 ```{r}
-panth %<>% dplyr::select(!c(Precip_Mean_mm, Temp_Mean_degC, AET_Mean_mm, PET_Mean_mm)) # remove environmental variables
+panth %<>% dplyr::select(!c(HomeRange_Indiv_km,GR_MidRangeLat_dd,GR_MidRangeLong_dd,Precip_Mean_mm, Temp_Mean_degC, AET_Mean_mm, PET_Mean_mm)) # remove environmental variables
 panth %<>% dplyr::select(!c(HuPopDen_Min_n_km, HuPopDen_p_n_km)) # remove correlated human density variables
 panth %<>% dplyr::select(!c(BasalMetRateMass_g)) # remove one metabolic variable
-panth %<>% dplyr::select(!c(AdultBodyMass_g, AdultForearmLen_mm, AdultHeadBodyLen_mm, NeonateBodyMass_g,NeonateHeadBodyLen_mm, WeaningBodyMass_g, WeaningHeadBodyLen_mm)) # remove all morphology variables except for the extrapolated variables and Teat number
+panth %<>% dplyr::select(!c(AdultBodyMass_g_EXT, AdultForearmLen_mm, AdultHeadBodyLen_mm, NeonateBodyMass_g_EXT, NeonateHeadBodyLen_mm, WeaningBodyMass_g, WeaningBodyMass_g_EXT, WeaningHeadBodyLen_mm)) # remove all morphology variables except for body masses
+panth %<>% dplyr::select(!c(ref_count))
 ```
 
 ```{r}
