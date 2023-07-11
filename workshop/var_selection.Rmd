@@ -29,7 +29,7 @@ colnames(panth) <- gsub("*\\d+", "", colnames(panth))
 colnames(panth) <- gsub("/", "_", colnames(panth))
 
 
-panth$ref_count <- str_count(panth$References, ";")
+# panth$ref_count <- str_count(panth$References, ";")
 
 panth$`ActivityCycle` <- as.factor(panth$`ActivityCycle`)
 panth$`DietBreadth` <- as.factor(panth$`DietBreadth`)

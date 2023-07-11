@@ -28,6 +28,7 @@ Read in data. To start, we are focusing on gmpd and pantheria
 ```{r read}
 gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_csv(here("data/panth_subset.csv"))
+refs <- read_csv(here("data/google_refs.csv"))
 ```
 
 
@@ -36,6 +37,10 @@ dummy_gmpd <- dummyVars(~ HostOrder, data = gmpd)
 gmpd_updated <- as_tibble(predict(dummy_gmpd, newdata = gmpd))
 gmpd <- cbind(gmpd, gmpd_updated)
 gmpd_dummy_vars <- gmpd %>% dplyr::select(HostCorrectedName, HostOrderArtiodactyla, HostOrderCarnivora, HostOrderPerissodactyla, HostOrderPrimates) %>% distinct()
+
+refs %<>% mutate(HostCorrectedName = str_replace(string = species, pattern = "\\+", replacement = " "),
+                 ref_count = results) %>% dplyr::select(-c(species, results))
+gmpd_dummy_vars %<>% left_join(.,refs, by = "HostCorrectedName")
 ```
 
 
@@ -158,8 +163,8 @@ gmpd_panth_proto %<>% filter(MSW_Binomial %in% intersect_hosts)
 
 
 ```{r}
-host_names <- tibble(species = gmpd_panth_helm$HostCorrectedName)
-write_csv(host_names, file = here("data/host_names.csv"))
+# host_names <- tibble(species = gmpd_panth_helm$HostCorrectedName)
+# write_csv(host_names, file = here("data/host_names.csv"))
 ```
 
 
@@ -275,6 +280,13 @@ gbm.plot(brt5_elith_bact, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, c
 gbm.plot(brt6_elith_proto, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "protozoa")
 ```
 
+```{r}
+plot.gbm(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
+
+```
+
+
+
 
 
 ```{r gmpd pdp2}
@@ -299,6 +311,16 @@ gbm.plot(brt4_elith_arth, variable.no = brt4_long_plot_no, plot.layout=c(1, 1), 
 gbm.plot(brt5_elith_bact, variable.no = brt5_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "bact")
 gbm.plot(brt6_elith_proto, variable.no = brt6_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "proto")
 ```
+
+```{r}
+plot.gbm(brt1_elith_full, n.plots=6, i.var = brt1_long_plot_no, main = "full", type = "response")
+plot.gbm(brt2_elith_helm, n.plots=6, i.var = brt2_long_plot_no, main = "helminth", type = "response")
+plot.gbm(brt3_elith_virus, n.plots=6, i.var = brt3_long_plot_no, main = "virus", type = "response")
+plot.gbm(brt4_elith_arth, n.plots=6, i.var = brt4_long_plot_no, main = "arthropod", type = "response")
+plot.gbm(brt5_elith_bact, n.plots=6, i.var = brt5_long_plot_no, main = "bacteria", type = "response")
+plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozoa", type = "response")
+```
+
 
 Becker and Han Method
 ```{r}
