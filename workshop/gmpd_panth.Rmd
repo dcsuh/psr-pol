@@ -157,6 +157,12 @@ gmpd_panth_proto %<>% filter(MSW_Binomial %in% intersect_hosts)
 ```
 
 
+```{r}
+host_names <- tibble(species = gmpd_panth_helm$HostCorrectedName)
+write_csv(host_names, file = here("data/host_names.csv"))
+```
+
+
 
 ```{r}
 gmpd_panth_helm %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
