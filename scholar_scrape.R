@@ -36,4 +36,6 @@ for (i in 1:nrow(names)){
   names$results[i] <- number
 }
 
+
+
 write_csv(names, here("data/google_refs.csv"))
