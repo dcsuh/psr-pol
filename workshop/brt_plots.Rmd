@@ -4,7 +4,7 @@ output: html_document
 date: "2023-07-14"
 ---
 
-```{r}
+```{r packages}
 library(here)
 library(tidyverse)
 library(magrittr)
@@ -13,13 +13,20 @@ library(dismo)
 library(gbm)
 ```
 
-```{r}
-readRDS(here("processed_data/brt_results/full_elith.rds"))
-readRDS(here("processed_data/brt_results/helm_elith.rds"))
-readRDS(here("processed_data/brt_results/virus_elith.rds"))
-readRDS(here("processed_data/brt_results/arth_elith.rds"))
-readRDS(here("processed_data/brt_results/bact_elith.rds"))
-readRDS(here("processed_data/brt_results/proto_elith.rds"))
+```{r data}
+brt1_elith_full <- readRDS(here("processed_data/brt_results/full_elith.rds"))
+brt2_elith_helm <- readRDS(here("processed_data/brt_results/helm_elith.rds"))
+brt3_elith_virus <- readRDS(here("processed_data/brt_results/virus_elith.rds"))
+brt4_elith_arth <- readRDS(here("processed_data/brt_results/arth_elith.rds"))
+brt5_elith_bact <- readRDS(here("processed_data/brt_results/bact_elith.rds"))
+brt6_elith_proto <- readRDS(here("processed_data/brt_results/proto_elith.rds"))
+
+summary(brt1_elith_full)
+summary(brt2_elith_helm)
+summary(brt3_elith_virus)
+summary(brt4_elith_arth)
+summary(brt5_elith_bact)
+summary(brt6_elith_proto)
 ```
 
 ```{r gmpd pdp 6}
@@ -31,12 +38,12 @@ gbm.plot(brt5_elith_bact, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, c
 gbm.plot(brt6_elith_proto, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "protozoa")
 ```
 
-```{r}
+```{r plot gbm test}
 plot.gbm(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
 
 ```
 
-```{r gmpd pdp2}
+```{r plot longevity}
 brt1_names <- brt1_elith_full$var.names
 brt2_names <- brt2_elith_helm$var.names
 brt3_names <- brt3_elith_virus$var.names
@@ -59,7 +66,7 @@ gbm.plot(brt5_elith_bact, variable.no = brt5_long_plot_no, plot.layout=c(1, 1), 
 gbm.plot(brt6_elith_proto, variable.no = brt6_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "proto")
 ```
 
-```{r}
+```{r plot gbm longevity}
 plot.gbm(brt1_elith_full, n.plots=6, i.var = brt1_long_plot_no, main = "full", type = "response")
 plot.gbm(brt2_elith_helm, n.plots=6, i.var = brt2_long_plot_no, main = "helminth", type = "response")
 plot.gbm(brt3_elith_virus, n.plots=6, i.var = brt3_long_plot_no, main = "virus", type = "response")
@@ -67,6 +74,31 @@ plot.gbm(brt4_elith_arth, n.plots=6, i.var = brt4_long_plot_no, main = "arthropo
 plot.gbm(brt5_elith_bact, n.plots=6, i.var = brt5_long_plot_no, main = "bacteria", type = "response")
 plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozoa", type = "response")
 ```
+
+
+```{r relative importance}
+brt1_full_ri <- brt1_elith_full$contributions
+brt2_helm_ri <- brt2_elith_helm$contributions
+brt3_virus_ri <- brt3_elith_virus$contributions
+brt4_arth_ri <- brt4_elith_arth$contributions
+brt5_bact_ri <- brt5_elith_bact$contributions
+brt6_proto_ri <- brt6_elith_proto$contributions
+```
+
+```{r bind rows}
+brt1_full_ri %<>% mutate(par_type = "full")
+brt2_helm_ri %<>% mutate(par_type = "helminth")
+brt3_virus_ri %<>% mutate(par_type = "virus")
+brt4_arth_ri %<>% mutate(par_type = "arthropod")
+brt5_bact_ri %<>% mutate(par_type = "bacteria")
+brt6_proto_ri %<>% mutate(par_type = "protozoa")
+
+brt_ri <- bind_rows(brt1_full_ri, brt2_helm_ri, brt3_virus_ri, brt4_arth_ri, brt5_bact_ri, brt6_proto_ri)
+rownames(brt_ri) <- NULL
+```
+
+
+
 
 
 
