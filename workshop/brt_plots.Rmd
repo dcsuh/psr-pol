@@ -1,0 +1,72 @@
+---
+title: "BRT plots"
+output: html_document
+date: "2023-07-14"
+---
+
+```{r}
+library(here)
+library(tidyverse)
+library(magrittr)
+
+library(dismo)
+library(gbm)
+```
+
+```{r}
+readRDS(here("processed_data/brt_results/full_elith.rds"))
+readRDS(here("processed_data/brt_results/helm_elith.rds"))
+readRDS(here("processed_data/brt_results/virus_elith.rds"))
+readRDS(here("processed_data/brt_results/arth_elith.rds"))
+readRDS(here("processed_data/brt_results/bact_elith.rds"))
+readRDS(here("processed_data/brt_results/proto_elith.rds"))
+```
+
+```{r gmpd pdp 6}
+gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
+gbm.plot(brt2_elith_helm, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "helminth")
+gbm.plot(brt3_elith_virus, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "virus")
+gbm.plot(brt4_elith_arth, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "arthropod")
+gbm.plot(brt5_elith_bact, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "bacteria")
+gbm.plot(brt6_elith_proto, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "protozoa")
+```
+
+```{r}
+plot.gbm(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
+
+```
+
+```{r gmpd pdp2}
+brt1_names <- brt1_elith_full$var.names
+brt2_names <- brt2_elith_helm$var.names
+brt3_names <- brt3_elith_virus$var.names
+brt4_names <- brt4_elith_arth$var.names
+brt5_names <- brt5_elith_bact$var.names
+brt6_names <- brt6_elith_proto$var.names
+
+brt1_long_plot_no <- which(brt1_names %in% c("MaxLongevity_m"))
+brt2_long_plot_no <- which(brt2_names %in% c("MaxLongevity_m"))
+brt3_long_plot_no <- which(brt3_names %in% c("MaxLongevity_m"))
+brt4_long_plot_no <- which(brt4_names %in% c("MaxLongevity_m"))
+brt5_long_plot_no <- which(brt5_names %in% c("MaxLongevity_m"))
+brt6_long_plot_no <- which(brt6_names %in% c("MaxLongevity_m"))
+
+gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "full")
+gbm.plot(brt2_elith_helm, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "helm")
+gbm.plot(brt3_elith_virus, variable.no = brt3_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "virus")
+gbm.plot(brt4_elith_arth, variable.no = brt4_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "arth")
+gbm.plot(brt5_elith_bact, variable.no = brt5_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "bact")
+gbm.plot(brt6_elith_proto, variable.no = brt6_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "proto")
+```
+
+```{r}
+plot.gbm(brt1_elith_full, n.plots=6, i.var = brt1_long_plot_no, main = "full", type = "response")
+plot.gbm(brt2_elith_helm, n.plots=6, i.var = brt2_long_plot_no, main = "helminth", type = "response")
+plot.gbm(brt3_elith_virus, n.plots=6, i.var = brt3_long_plot_no, main = "virus", type = "response")
+plot.gbm(brt4_elith_arth, n.plots=6, i.var = brt4_long_plot_no, main = "arthropod", type = "response")
+plot.gbm(brt5_elith_bact, n.plots=6, i.var = brt5_long_plot_no, main = "bacteria", type = "response")
+plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozoa", type = "response")
+```
+
+
+

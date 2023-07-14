@@ -270,7 +270,18 @@ summary(brt3_elith_virus)
 summary(brt4_elith_arth)
 summary(brt5_elith_bact)
 summary(brt6_elith_proto)
+
+saveRDS(brt1_elith_full, file = here("processed_data/brt_results/full_elith.rds"))
+saveRDS(brt2_elith_helm, file = here("processed_data/brt_results/helm_elith.rds"))
+saveRDS(brt3_elith_virus, file = here("processed_data/brt_results/virus_elith.rds"))
+saveRDS(brt4_elith_arth, file = here("processed_data/brt_results/arth_elith.rds"))
+saveRDS(brt5_elith_bact, file = here("processed_data/brt_results/bact_elith.rds"))
+saveRDS(brt6_elith_proto, file = here("processed_data/brt_results/proto_elith.rds"))
+
 ```
+
+
+
 ```{r gmpd pdp 6}
 gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
 gbm.plot(brt2_elith_helm, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "helminth")
@@ -284,10 +295,6 @@ gbm.plot(brt6_elith_proto, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, 
 plot.gbm(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
 
 ```
-
-
-
-
 
 ```{r gmpd pdp2}
 brt1_names <- brt1_elith_full$var.names
@@ -320,6 +327,15 @@ plot.gbm(brt4_elith_arth, n.plots=6, i.var = brt4_long_plot_no, main = "arthropo
 plot.gbm(brt5_elith_bact, n.plots=6, i.var = brt5_long_plot_no, main = "bacteria", type = "response")
 plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozoa", type = "response")
 ```
+
+
+
+
+
+
+
+
+
 
 
 Becker and Han Method
