@@ -112,23 +112,21 @@ brt_ri %<>% left_join(., var_type)
 
 
 ```{r}
-ggplot(data = brt_ri, aes(x = par_type, y = ranking, group = var)) +
+brt_ri %>% filter(par_type != "full") %>%
+ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
   geom_line(aes(color = var)) +
   geom_point(aes(color = var, alpha = 1), size = 4) +
   scale_y_reverse(breaks = 1:nrow(brt_ri))
-  
-
 ```
 
 
 ```{r}
-ggplot(data = brt_ri, aes(x = par_type, y = ranking, group = var)) +
+brt_ri %>% filter(par_type != "full") %>%
+ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
   geom_line(aes(color = var_type)) +
   geom_point(aes(color = var_type), size = 4) +
-  scale_y_reverse(breaks = 1:nrow(brt_ri))
-  
-
-
+  scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+  theme_minimal()
 ```
 
 
