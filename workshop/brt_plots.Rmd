@@ -14,6 +14,8 @@ library(gbm)
 ```
 
 ```{r data}
+var_type <- read_csv(here("data/var_type.csv"))
+
 brt1_elith_full <- readRDS(here("processed_data/brt_results/full_elith.rds"))
 brt2_elith_helm <- readRDS(here("processed_data/brt_results/helm_elith.rds"))
 brt3_elith_virus <- readRDS(here("processed_data/brt_results/virus_elith.rds"))
@@ -98,7 +100,35 @@ rownames(brt_ri) <- NULL
 ```
 
 
+```{r}
+brt_ri %<>% group_by(par_type) %>%
+  arrange(desc(rel.inf)) %>%
+  mutate(ranking = row_number())
+
+var_type %<>% mutate(var = variable) %>% dplyr::select(-c(variable))
+
+brt_ri %<>% left_join(., var_type)
+```
 
 
+```{r}
+ggplot(data = brt_ri, aes(x = par_type, y = ranking, group = var)) +
+  geom_line(aes(color = var)) +
+  geom_point(aes(color = var, alpha = 1), size = 4) +
+  scale_y_reverse(breaks = 1:nrow(brt_ri))
+  
+
+```
+
+
+```{r}
+ggplot(data = brt_ri, aes(x = par_type, y = ranking, group = var)) +
+  geom_line(aes(color = var_type)) +
+  geom_point(aes(color = var_type), size = 4) +
+  scale_y_reverse(breaks = 1:nrow(brt_ri))
+  
+
+
+```
 
 
