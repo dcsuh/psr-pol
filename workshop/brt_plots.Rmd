@@ -171,16 +171,15 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = rel.inf)) +
 
 
 ```{r pdp}
-#### NEW PLOTS
-best.iter <- gbm.perf(my.gbm,method="cv")
-####### 1. coral area
-inv<-pdp::partial(my.gbm,n.trees=best.iter,"coral.area",prob=T)
+brt1_train_data <- brt1_elith_full$gbm.call$dataframe
+brt2_train_data <- brt2_elith_helm$gbm.call$dataframe
 
-inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = brt1_elith_full$gbm.call$dataframe)
+inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = brt1_train_data)
+inv <- pdp::partial(brt2_elith_helm, n.trees=brt2_elith_helm$n.trees, "MaxLongevity_m", prob = T, train = brt2_train_data)
 ```
 
 
-```{r pdp}
+```{r plot pdp}
 plot1 <- inv %>%
 #dplyr::select(coral.area, yhat) %>%
 na.omit() %>%
@@ -193,7 +192,7 @@ theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(),
 theme(axis.text.x=element_blank(),
 axis.ticks.x=element_blank(),axis.text=element_text(size=12))
 
-plot2 <- gmpd_panth_train %>%
+plot2 <- brt1_train_data %>%
 dplyr::select(MaxLongevity_m) %>%
 na.omit() %>%
 ggplot(aes(MaxLongevity_m)) +
@@ -207,12 +206,12 @@ theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
 ```
 
 
-```{r pdp}
-p1 <- add_sub(plot1," ")
-p2 <- add_sub(plot2,"Max Longevity",size=12)
+```{r overlay}
+lin <- add_sub(plot1," ")
+his <- add_sub(plot2,"Max Longevity",size=12)
 p.max_long<-ggdraw() +
-  draw_plot(p2,x=0.05,scale=0.95) +
-  draw_plot(p1,x=-0.05,scale=0.975,y=0.05)
+  draw_plot(his,x=0.03,scale=1) +
+  draw_plot(lin,x=0,scale=1, y = 0.05)
 
 p.max_long
 ```
