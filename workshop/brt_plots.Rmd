@@ -138,7 +138,7 @@ best.iter <- gbm.perf(my.gbm,method="cv")
 ####### 1. coral area
 inv<-pdp::partial(my.gbm,n.trees=best.iter,"coral.area",prob=T)
 
-inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = gmpd_panth_train)
+inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = brt1_elith_full$gbm.call$dataframe)
 ```
 
 
