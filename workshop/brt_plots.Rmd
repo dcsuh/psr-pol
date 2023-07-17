@@ -206,28 +206,19 @@ make_plots <- function(model, var, bin_n = 10) {
     theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
     #theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
   
-  lin <- add_sub(plot1," ")
-  his <- add_sub(plot2,var,size=12)
-  p.max_long<-ggdraw()
-  p.max_long
+  # lin <- add_sub(plot1," ")
+  # his <- add_sub(plot2,var,size=12)
+  list(pdp=plot1,histo=plot2)
 }
-
-tmp <- make_plots(brt1_elith_full, "MaxLongevity_m")
-
-tmp + 
-  draw_plot(his, x=0.03, scale = 1) +
-  draw_plot(lin, x=0.05, scale = 1, y = 0.05)
 ```
 
 
 ```{r overlay}
-lin <- add_sub(plot1," ")
-his <- add_sub(plot2,"Max Longevity",size=12)
-p.max_long<-ggdraw() +
-  draw_plot(his,x=0.03,scale=1) +
-  draw_plot(lin,x=0,scale=1, y = 0.05)
+brt1_plots <- make_plots(brt1_elith_full, "MaxLongevity_m")
 
-p.max_long
+full_max_long <- ggdraw()+
+  draw_plot(brt1_plots$histo, x=0.03, scale = 1) +
+  draw_plot(brt2_plots$pdp, x=0.05, scale = 1, y = 0.05)
 ```
 
 
