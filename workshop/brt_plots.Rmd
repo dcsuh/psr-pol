@@ -170,11 +170,8 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = rel.inf)) +
 
 
 
-```{r pdp}
-brt1_train_data <- brt1_elith_full$gbm.call$dataframe
-brt2_train_data <- brt2_elith_helm$gbm.call$dataframe
-
-make_plots <- function(model, var, bin_n = 10) {
+```{r make pdp function}
+make_plots <- function(model, var, bin_n = 40) {
   
   data <- model$gbm.call$dataframe
   
@@ -196,6 +193,7 @@ make_plots <- function(model, var, bin_n = 10) {
     axis.ticks.x=element_blank(),axis.text=element_text(size=12))
   
   plot2 <- data %>%
+  dplyr::select(.data[[var]]) %>%
   na.omit() %>%
   ggplot(aes(.data[[var]])) +
     geom_histogram(breaks = seq(0,x_max, x_max/bin_n), fill="gray") +
@@ -206,19 +204,39 @@ make_plots <- function(model, var, bin_n = 10) {
     theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
     #theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
   
-  # lin <- add_sub(plot1," ")
-  # his <- add_sub(plot2,var,size=12)
   list(pdp=plot1,histo=plot2)
 }
 ```
 
-
-```{r overlay}
-brt1_plots <- make_plots(brt1_elith_full, "MaxLongevity_m")
-
-full_max_long <- ggdraw()+
-  draw_plot(brt1_plots$histo, x=0.03, scale = 1) +
-  draw_plot(brt2_plots$pdp, x=0.05, scale = 1, y = 0.05)
+```{r make pdp plots}
+brt1_plots_max_long <- make_plots(brt1_elith_full, "MaxLongevity_m")
+brt2_plots_max_long <- make_plots(brt2_elith_helm, "MaxLongevity_m")
+brt3_plots_max_long <- make_plots(brt3_elith_virus, "MaxLongevity_m")
 ```
+
+
+
+```{r max longevity full plot}
+full_max_long <- ggdraw()+
+  draw_plot(brt1_plots_max_long$histo, x=0.05, scale = 0.95) +
+  draw_plot(brt1_plots_max_long$pdp, x=-0.03, scale = 0.975, y = 0.055)
+full_max_long
+```
+
+```{r helminth max long}
+helm_max_long <- ggdraw()+
+  draw_plot(brt2_plots_max_long$histo, x=0, scale = 1) +
+  draw_plot(brt2_plots_max_long$pdp, x=-0, scale = 1, y = 0.05)
+helm_max_long
+```
+
+
+```{r virus max long}
+virus_max_long <- ggdraw()+
+  draw_plot(brt3_plots_max_long$histo, x=0, scale = 1) +
+  draw_plot(brt3_plots_max_long$pdp, x=-0, scale = 1, y = 0.055)
+virus_max_long
+```
+
 
 
