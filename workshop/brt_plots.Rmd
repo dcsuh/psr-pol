@@ -11,6 +11,8 @@ library(magrittr)
 
 library(dismo)
 library(gbm)
+library(pdp)
+library(cowplot)
 ```
 
 ```{r data}
@@ -100,7 +102,7 @@ rownames(brt_ri) <- NULL
 ```
 
 
-```{r}
+```{r make rel inf df}
 brt_ri %<>% group_by(par_type) %>%
   arrange(desc(rel.inf)) %>%
   mutate(ranking = row_number())
@@ -111,7 +113,7 @@ brt_ri %<>% left_join(., var_type)
 ```
 
 
-```{r}
+```{r plot by variable}
 brt_ri %>% filter(par_type != "full") %>%
 ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
   geom_line(aes(color = var)) +
@@ -120,13 +122,61 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 ```
 
 
-```{r}
+```{r plot by type}
 brt_ri %>% filter(par_type != "full") %>%
 ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
   geom_line(aes(color = var_type)) +
   geom_point(aes(color = var_type), size = 4) +
   scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
   theme_minimal()
+```
+
+
+```{r pdp}
+#### NEW PLOTS
+best.iter <- gbm.perf(my.gbm,method="cv")
+####### 1. coral area
+inv<-pdp::partial(my.gbm,n.trees=best.iter,"coral.area",prob=T)
+
+inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = gmpd_panth_train)
+```
+
+
+```{r pdp}
+plot1 <- inv %>%
+#dplyr::select(coral.area, yhat) %>%
+na.omit() %>%
+ggplot() +
+geom_line(aes(x = MaxLongevity_m, y = yhat),color="black",size=1) +
+xlim(0,750)+
+ylab(" ") +
+theme_minimal() +
+theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+theme(axis.text.x=element_blank(),
+axis.ticks.x=element_blank(),axis.text=element_text(size=12))
+
+plot2 <- gmpd_panth_train %>%
+dplyr::select(MaxLongevity_m) %>%
+na.omit() %>%
+ggplot(aes(MaxLongevity_m)) +
+geom_histogram(breaks = seq(0,750, by = 10), fill="gray") +
+#geom_histogram(fill="gray",binwidth=20) +
+scale_y_continuous(position = "right")+
+ylab("") +
+theme_minimal() +
+theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
+#theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
+```
+
+
+```{r pdp}
+p1 <- add_sub(plot1," ")
+p2 <- add_sub(plot2,"Max Longevity",size=12)
+p.max_long<-ggdraw() +
+  draw_plot(p2,x=0.05,scale=0.95) +
+  draw_plot(p1,x=-0.05,scale=0.975,y=0.05)
+
+p.max_long
 ```
 
 
