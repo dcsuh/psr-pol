@@ -219,23 +219,28 @@ brt3_plots_max_long <- make_plots(brt3_elith_virus, "MaxLongevity_m")
 ```{r max longevity full plot}
 full_max_long <- ggdraw()+
   draw_plot(brt1_plots_max_long$histo, x=0.05, scale = 0.95) +
-  draw_plot(brt1_plots_max_long$pdp, x=-0.03, scale = 0.975, y = 0.055)
+  draw_plot(brt1_plots_max_long$pdp, x=-0.03, scale = 0.975, y = 0.05)
 full_max_long
+ggsave(here("figures/pdp/full_max_long.png"), full_max_long)
 ```
 
 ```{r helminth max long}
 helm_max_long <- ggdraw()+
-  draw_plot(brt2_plots_max_long$histo, x=0, scale = 1) +
-  draw_plot(brt2_plots_max_long$pdp, x=-0, scale = 1, y = 0.05)
+  draw_plot(brt2_plots_max_long$histo, x=0.03, scale = 0.925) +
+  draw_plot(brt2_plots_max_long$pdp, x=-0.0425, scale = 0.975, y = 0.065)
 helm_max_long
+ggsave(here("figures/pdp/helm_max_long.png"), helm_max_long)
+
 ```
 
 
 ```{r virus max long}
 virus_max_long <- ggdraw()+
-  draw_plot(brt3_plots_max_long$histo, x=0, scale = 1) +
-  draw_plot(brt3_plots_max_long$pdp, x=-0, scale = 1, y = 0.055)
+  draw_plot(brt3_plots_max_long$histo, x=0.03, scale = 0.95) +
+  draw_plot(brt3_plots_max_long$pdp, x=-0.03, scale = 0.975, y = 0.055)
 virus_max_long
+ggsave(here("figures/pdp/virus_max_long.png"), virus_max_long)
+
 ```
 
 
