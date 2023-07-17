@@ -174,35 +174,49 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = rel.inf)) +
 brt1_train_data <- brt1_elith_full$gbm.call$dataframe
 brt2_train_data <- brt2_elith_helm$gbm.call$dataframe
 
-inv <- pdp::partial(brt1_elith_full, n.trees=brt1_elith_full$n.trees, "MaxLongevity_m", prob = T, train = brt1_train_data)
-inv <- pdp::partial(brt2_elith_helm, n.trees=brt2_elith_helm$n.trees, "MaxLongevity_m", prob = T, train = brt2_train_data)
-```
+make_plots <- function(model, var, bin_n = 10) {
+  
+  data <- model$gbm.call$dataframe
+  
+  var_no <- which(colnames(data) %in% c(var))
+  
+  inv <- pdp::partial(model, n.trees=model$n.trees, var, prob = T, train = data)
+  
+  x_max <- max(data[var_no], na.rm=T)
+  
+  plot1 <- inv %>%
+  na.omit() %>%
+  ggplot() +
+    geom_line(aes(x = .data[[var]], y = yhat),color="black",size=1) +
+    xlim(0,x_max)+
+    ylab(" ") +
+    theme_minimal() +
+    theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+    theme(axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),axis.text=element_text(size=12))
+  
+  plot2 <- data %>%
+  na.omit() %>%
+  ggplot(aes(.data[[var]])) +
+    geom_histogram(breaks = seq(0,x_max, x_max/bin_n), fill="gray") +
+    #geom_histogram(fill="gray",binwidth=20) +
+    scale_y_continuous(position = "right")+
+    ylab("") +
+    theme_minimal() +
+    theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
+    #theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
+  
+  lin <- add_sub(plot1," ")
+  his <- add_sub(plot2,var,size=12)
+  p.max_long<-ggdraw()
+  p.max_long
+}
 
+tmp <- make_plots(brt1_elith_full, "MaxLongevity_m")
 
-```{r plot pdp}
-plot1 <- inv %>%
-#dplyr::select(coral.area, yhat) %>%
-na.omit() %>%
-ggplot() +
-geom_line(aes(x = MaxLongevity_m, y = yhat),color="black",size=1) +
-xlim(0,750)+
-ylab(" ") +
-theme_minimal() +
-theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-theme(axis.text.x=element_blank(),
-axis.ticks.x=element_blank(),axis.text=element_text(size=12))
-
-plot2 <- brt1_train_data %>%
-dplyr::select(MaxLongevity_m) %>%
-na.omit() %>%
-ggplot(aes(MaxLongevity_m)) +
-geom_histogram(breaks = seq(0,750, by = 10), fill="gray") +
-#geom_histogram(fill="gray",binwidth=20) +
-scale_y_continuous(position = "right")+
-ylab("") +
-theme_minimal() +
-theme(axis.title.x = element_blank(),axis.text=element_text(size=12))#+
-#theme(plot.margin=unit(c(0,0,0,1.25),"cm"))
+tmp + 
+  draw_plot(his, x=0.03, scale = 1) +
+  draw_plot(lin, x=0.05, scale = 1, y = 0.05)
 ```
 
 
