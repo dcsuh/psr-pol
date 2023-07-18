@@ -174,6 +174,37 @@ brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
 
 
 
+Which variables consistently rank in the top 15 among parasite types?
+```{r}
+top15 <- brt_ri %>% filter(ranking<16)
+brt2_top15_helm <- top15 %>% filter(par_type == "helminth")
+brt2_top15_helm <- brt2_top15_helm$var
+brt3_top15_virus <- top15 %>% filter(par_type == "virus")
+brt3_top15_virus <- brt3_top15_virus$var
+brt4_top15_arth <- top15 %>% filter(par_type == "arthropod")
+brt4_top15_arth <- brt4_top15_arth$var
+brt5_top15_bact <- top15 %>% filter(par_type == "bacteria")
+brt5_top15_bact <- brt5_top15_bact$var
+brt6_top15_proto <- top15 %>% filter(par_type == "protozoa")
+brt6_top15_proto <- brt6_top15_proto$var
+
+
+intersect_vars <- Reduce(intersect, 
+                          list(brt2_top15_helm, brt3_top15_virus, brt4_top15_arth, brt5_top15_bact, brt6_top15_proto))
+
+top_vars <- brt_ri %>% filter(var %in% intersect_vars)
+```
+
+```{r}
+top_vars %>% filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  group_by(par_type) %>%
+  ggplot(.,aes(x = par_type, y = rel.inf, fill = var)) + 
+  geom_bar(position = "stack", stat = "identity") + 
+  theme_minimal()
+```
+
+
+
 ```{r make pdp function}
 make_plots <- function(model, var, bin_n = 40, y_fixed = F, y_axis, par_type = 0) {
   
@@ -224,7 +255,7 @@ make_plots <- function(model, var, bin_n = 40, y_fixed = F, y_axis, par_type = 0
   dplyr::select(.data[[var]]) %>%
   na.omit() %>%
   ggplot(aes(.data[[var]])) +
-    geom_histogram(breaks = seq(0,x_max, x_max/bin_n), fill="orange") +
+    geom_histogram(breaks = seq(0,x_max, x_max/bin_n), fill="gray") +
     #geom_histogram(fill="gray",binwidth=20) +
     scale_y_continuous(position = "right")+
     ylab("") +
@@ -280,6 +311,8 @@ max_long_pdp <-pdp_draw(brt2_plots_max_long,
                  pdp_scale = 0.98,
                  pdp_y =)
 
+max_long_pdp
+
 ggsave(here("figures/pdp/max_long.png"), max_long_pdp)
 ```
 
@@ -309,53 +342,152 @@ ref_count_pdp <- pdp_draw(brt2_ref_count_plot,
                      pdp_scale = 0.95,
                      pdp_y = 0.055)
 
+ref_count_pdp
+
 ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp)
 
 ```
 
 ```{r}
-maturity_y <- c(1,50)
+maturity_y <- c(5,32)
 
-brt2_maturity_plot <- make_plots(brt2_elith_helm, "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "helminth")
-brt3_maturity_plot <- make_plots(brt3_elith_virus, "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "")
-brt4_maturity_plot <- make_plots(brt4_elith_arth, "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "")
-brt5_maturity_plot <- make_plots(brt5_elith_bact, "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "")
-brt6_maturity_plot <- make_plots(brt6_elith_proto, "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "")
+brt2_maturity_plot <- make_plots(brt2_elith_helm, 
+                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "helminth")
+brt3_maturity_plot <- make_plots(brt3_elith_virus, 
+                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "virus")
+brt4_maturity_plot <- make_plots(brt4_elith_arth, 
+                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "arthropod")
+brt5_maturity_plot <- make_plots(brt5_elith_bact, 
+                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "bacteria")
+brt6_maturity_plot <- make_plots(brt6_elith_proto, 
+                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "protozoa")
 
 ```
 
-
-
-
-
-Which variables consistently rank in the top 15 among parasite types?
-```{r}
-top15 <- brt_ri %>% filter(ranking<16)
-brt2_top15_helm <- top15 %>% filter(par_type == "helminth")
-brt2_top15_helm <- brt2_top15_helm$var
-brt3_top15_virus <- top15 %>% filter(par_type == "virus")
-brt3_top15_virus <- brt3_top15_virus$var
-brt4_top15_arth <- top15 %>% filter(par_type == "arthropod")
-brt4_top15_arth <- brt4_top15_arth$var
-brt5_top15_bact <- top15 %>% filter(par_type == "bacteria")
-brt5_top15_bact <- brt5_top15_bact$var
-brt6_top15_proto <- top15 %>% filter(par_type == "protozoa")
-brt6_top15_proto <- brt6_top15_proto$var
-
-
-intersect_vars <- Reduce(intersect, 
-                          list(brt2_top15_helm, brt3_top15_virus, brt4_top15_arth, brt5_top15_bact, brt6_top15_proto))
-
-top_vars <- brt_ri %>% filter(var %in% intersect_vars)
-```
 
 ```{r}
-top_vars %>% filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
-  group_by(par_type) %>%
-  ggplot(.,aes(x = par_type, y = rel.inf, fill = var)) + 
-  geom_bar(position = "stack", stat = "identity") + 
-  theme_minimal()
+maturity_pdp <- pdp_draw(brt2_maturity_plot,
+                     brt3_maturity_plot,
+                     brt4_maturity_plot,
+                     brt5_maturity_plot,
+                     brt6_maturity_plot,
+                     hist_x = ,
+                     hist_scale = ,
+                     pdp_x = -0.029,
+                     pdp_scale = 0.951,
+                     pdp_y = )
+
+maturity_pdp
+
+ggsave(here("figures/pdp/sexual_maturity.png"), maturity_pdp)
+
 ```
+
+```{r}
+range_y <- c(5,30)
+
+brt2_range_plot <- make_plots(brt2_elith_helm, 
+                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "helminth")
+brt3_range_plot <- make_plots(brt3_elith_virus, 
+                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "virus")
+brt4_range_plot <- make_plots(brt4_elith_arth, 
+                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "arthropod")
+brt5_range_plot <- make_plots(brt5_elith_bact, 
+                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "bacteria")
+brt6_range_plot <- make_plots(brt6_elith_proto, 
+                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "protozoa")
+
+```
+
+
+```{r}
+range_pdp <- pdp_draw(brt2_range_plot,
+                     brt3_range_plot,
+                     brt4_range_plot,
+                     brt5_range_plot,
+                     brt6_range_plot,
+                     hist_x = ,
+                     hist_scale = ,
+                     pdp_x = -0.01,
+                     pdp_scale = 0.945,
+                     pdp_y = )
+
+range_pdp
+
+ggsave(here("figures/pdp/home_range.png"), range_pdp)
+
+```
+
+```{r}
+area_y <- c(5,26)
+
+brt2_area_plot <- make_plots(brt2_elith_helm, 
+                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "helminth")
+brt3_area_plot <- make_plots(brt3_elith_virus, 
+                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "virus")
+brt4_area_plot <- make_plots(brt4_elith_arth, 
+                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "arthropod")
+brt5_area_plot <- make_plots(brt5_elith_bact, 
+                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "bacteria")
+brt6_area_plot <- make_plots(brt6_elith_proto, 
+                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "protozoa")
+
+```
+
+
+```{r}
+area_pdp <- pdp_draw(brt2_area_plot,
+                     brt3_area_plot,
+                     brt4_area_plot,
+                     brt5_area_plot,
+                     brt6_area_plot,
+                     hist_x = ,
+                     hist_scale = ,
+                     pdp_x = -0.01,
+                     pdp_scale = 0.95,
+                     pdp_y = )
+
+area_pdp
+
+ggsave(here("figures/pdp/gr_area.png"), area_pdp)
+
+```
+
+```{r}
+pop_dens_y <- c(5,30)
+
+brt2_pop_dens_plot <- make_plots(brt2_elith_helm, 
+                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "helminth")
+brt3_pop_dens_plot <- make_plots(brt3_elith_virus, 
+                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "virus")
+brt4_pop_dens_plot <- make_plots(brt4_elith_arth, 
+                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "arthropod")
+brt5_pop_dens_plot <- make_plots(brt5_elith_bact, 
+                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "bacteria")
+brt6_pop_dens_plot <- make_plots(brt6_elith_proto, 
+                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "protozoa")
+
+```
+
+
+```{r}
+pop_dens_pdp <- pdp_draw(brt2_pop_dens_plot,
+                     brt3_pop_dens_plot,
+                     brt4_pop_dens_plot,
+                     brt5_pop_dens_plot,
+                     brt6_pop_dens_plot,
+                     hist_x = ,
+                     hist_scale = ,
+                     pdp_x = -0.01,
+                     pdp_scale = 0.95,
+                     pdp_y = )
+
+pop_dens_pdp
+
+ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp)
+
+```
+
 
 
 
