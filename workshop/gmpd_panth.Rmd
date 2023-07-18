@@ -188,14 +188,16 @@ gmpd_panth_micro %<>% filter(MSW_Binomial %in% intersect_hosts)
 # write_csv(host_names, file = here("data/host_names.csv"))
 ```
 
+```{r}
+train <- sample(1:nrow(gmpd_panth_helm), nrow(gmpd_panth_helm) * 0.8)
+test <- gmpd_panth_helm %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+test <- as.integer(test$row_num)
+```
 
 
 ```{r}
 gmpd_panth_helm %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_helm), nrow(gmpd_panth_helm) * 0.8)
-test <- gmpd_panth_helm %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_helm_train <- gmpd_panth_helm[train,]
 gmpd_panth_helm_test <- gmpd_panth_helm[test,]
 ```
@@ -203,19 +205,12 @@ gmpd_panth_helm_test <- gmpd_panth_helm[test,]
 ```{r}
 gmpd_panth_arth %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_arth), nrow(gmpd_panth_arth) * 0.8)
-test <- gmpd_panth_arth %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_arth_train <- gmpd_panth_arth[train,]
 gmpd_panth_arth_test <- gmpd_panth_arth[test,]
 ```
 
 ```{r}
 gmpd_panth_virus %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
-
-train <- sample(1:nrow(gmpd_panth_virus), nrow(gmpd_panth_virus) * 0.8)
-test <- gmpd_panth_virus %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 
 gmpd_panth_virus_train <- gmpd_panth_virus[train,]
 gmpd_panth_virus_test <- gmpd_panth_virus[test,]
@@ -224,9 +219,6 @@ gmpd_panth_virus_test <- gmpd_panth_virus[test,]
 ```{r}
 gmpd_panth_bact %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_bact), nrow(gmpd_panth_bact) * 0.8)
-test <- gmpd_panth_bact %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_bact_train <- gmpd_panth_bact[train,]
 gmpd_panth_bact_test <- gmpd_panth_bact[test,]
 ```
@@ -234,9 +226,6 @@ gmpd_panth_bact_test <- gmpd_panth_bact[test,]
 ```{r}
 gmpd_panth_proto %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_proto), nrow(gmpd_panth_proto) * 0.8)
-test <- gmpd_panth_proto %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_proto_train <- gmpd_panth_proto[train,]
 gmpd_panth_proto_test <- gmpd_panth_proto[test,]
 ```
@@ -244,9 +233,6 @@ gmpd_panth_proto_test <- gmpd_panth_proto[test,]
 ```{r}
 gmpd_panth_macro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_macro), nrow(gmpd_panth_macro) * 0.8)
-test <- gmpd_panth_macro %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_macro_train <- gmpd_panth_macro[train,]
 gmpd_panth_macro_test <- gmpd_panth_macro[test,]
 ```
@@ -254,9 +240,6 @@ gmpd_panth_macro_test <- gmpd_panth_macro[test,]
 ```{r}
 gmpd_panth_micro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
 
-train <- sample(1:nrow(gmpd_panth_micro), nrow(gmpd_panth_micro) * 0.8)
-test <- gmpd_panth_micro %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
 gmpd_panth_micro_train <- gmpd_panth_micro[train,]
 gmpd_panth_micro_test <- gmpd_panth_micro[test,]
 ```

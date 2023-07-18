@@ -149,29 +149,33 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 
 
 ```{r plot by type}
-brt_ri %>% filter(par_type != "full") %>%
-ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
-  geom_line(aes(color = var_type)) +
-  geom_point(aes(color = var_type), size = 4) +
-  scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
-  theme_minimal()
+brt_ri %>% filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
+filter(ranking < 11) %>%
+  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
+    geom_line(aes(color = var_type), size = 1) +
+    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
+#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
+    geom_point(aes(color = var_type), size = 10) +
+    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    theme_minimal()
 ```
 
 ```{r plot by macro micro}
 brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
-ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = rel.inf)) +
-  geom_line(aes(color = var), size = 1) +
-#  scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var_type))) +
-#  scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
-  geom_point(aes(color = var)) +
-  scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
-  theme_minimal()
+  filter(ranking < 11) %>%
+  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
+    geom_line(aes(color = var_type), size = 1) +
+    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
+#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
+    geom_point(aes(color = var_type), size = 10) +
+    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    theme_minimal()
 ```
 
 
 
 ```{r make pdp function}
-make_plots <- function(model, var, bin_n = 40) {
+make_plots <- function(model, var, bin_n = 40, y_fixed = F, y_axis) {
   
   data <- model$gbm.call$dataframe
   
@@ -181,17 +185,28 @@ make_plots <- function(model, var, bin_n = 40) {
   
   x_max <- max(data[var_no], na.rm=T)
   
+
+  if(y_fixed==T){
+    y_max = y_axis[2]
+    y_min = y_axis[1]
+  } else {
+    y_max = max(inv$yhat)
+    y_min <- min(inv$yhat)
+
+  }
+  
   plot1 <- inv %>%
   na.omit() %>%
   ggplot() +
     geom_line(aes(x = .data[[var]], y = yhat),color="black",size=1) +
     xlim(0,x_max)+
+    ylim(y_min,y_max)+
     ylab(" ") +
     theme_minimal() +
     theme(axis.title.x = element_blank())+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
     theme(axis.text.x=element_blank(),
     axis.ticks.x=element_blank(),axis.text=element_text(size=12))
-  
+
   plot2 <- data %>%
   dplyr::select(.data[[var]]) %>%
   na.omit() %>%
@@ -242,6 +257,31 @@ virus_max_long
 ggsave(here("figures/pdp/virus_max_long.png"), virus_max_long)
 
 ```
+
+
+```{r ref count pdp}
+brt1_ref_count_plot <- make_plots(brt1_elith_full, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt2_ref_count_plot <- make_plots(brt2_elith_helm, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt3_ref_count_plot <- make_plots(brt3_elith_virus, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt4_ref_count_plot <- make_plots(brt4_elith_arth, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt5_ref_count_plot <- make_plots(brt5_elith_bact, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt6_ref_count_plot <- make_plots(brt6_elith_proto, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt7_ref_count_plot <- make_plots(brt7_elith_macro, "ref_count", y_fixed = T, y_axis = c(1,4))
+brt8_ref_count_plot <- make_plots(brt8_elith_micro, "ref_count", y_fixed = T, y_axis = c(1,4))
+```
+
+```{r}
+ggdraw()+
+  draw_plot(brt1_ref_count_plot$histo, x=0.03, scale = 0.95) +
+  draw_plot(brt1_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055) +
+  draw_plot(brt2_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055) +
+  draw_plot(brt3_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055) +
+  draw_plot(brt4_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055) +
+  draw_plot(brt5_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055) +
+  draw_plot(brt6_ref_count_plot$pdp, x=-0.03, scale = 0.975, y = 0.055)
+```
+
+
 
 
 
