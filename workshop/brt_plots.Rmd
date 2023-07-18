@@ -327,16 +327,19 @@ brt8_ref_count_plot <- make_plots(brt8_elith_micro, "ref_count", y_fixed = T, y_
 ```
 
 ```{r}
-pdp_draw(brt2_ref_count_plot,
-         brt3_ref_count_plot,
-         brt4_ref_count_plot,
-         brt5_ref_count_plot,
-         brt6_ref_count_plot,
-         hist_x = ,
-         hist_scale = ,
-         pdp_x = -0.01,
-         pdp_scale = 0.95,
-         pdp_y = 0.055)
+ref_count_pdp <- pdp_draw(brt2_ref_count_plot,
+                     brt3_ref_count_plot,
+                     brt4_ref_count_plot,
+                     brt5_ref_count_plot,
+                     brt6_ref_count_plot,
+                     hist_x = ,
+                     hist_scale = ,
+                     pdp_x = -0.013,
+                     pdp_scale = 0.95,
+                     pdp_y = 0.055)
+
+ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp)
+
 ```
 
 
