@@ -171,6 +171,54 @@ brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
     scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
     theme_minimal()
 ```
+which variables are top 5 for each parasite type?
+```{r}
+brt_ri %>% filter(par_type %in% c("arthropod")) %>% filter(ranking < 6) %>% 
+  arrange(desc(rel.inf)) %>%
+  mutate(var=factor(var, levels=var)) %>%
+  ggplot(., aes(x = var, y = rel.inf)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  ylim(0,27) +
+  labs(title = "Arthropod Species Richness")
+
+brt_ri %>% filter(par_type %in% c("helminth")) %>% filter(ranking < 6) %>% 
+  arrange(desc(rel.inf)) %>%
+  mutate(var=factor(var, levels=var)) %>%
+  ggplot(., aes(x = var, y = rel.inf)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  ylim(0,27) +
+  labs(title = "Helminth Species Richness")
+
+
+brt_ri %>% filter(par_type %in% c("virus")) %>% filter(ranking < 6) %>% 
+  arrange(desc(rel.inf)) %>%
+  mutate(var=factor(var, levels=var)) %>%
+  ggplot(., aes(x = var, y = rel.inf)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  ylim(0,27) +
+  labs(title = "Virus Species Richness")
+
+
+brt_ri %>% filter(par_type %in% c("bacteria")) %>% filter(ranking < 6) %>% 
+  arrange(desc(rel.inf)) %>%
+  mutate(var=factor(var, levels=var)) %>%
+  ggplot(., aes(x = var, y = rel.inf)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  ylim(0,27) +
+  labs(title = "Bacteria Species Richness")
+
+
+brt_ri %>% filter(par_type %in% c("protozoa")) %>% filter(ranking < 6) %>% 
+  arrange(desc(rel.inf)) %>%
+  mutate(var=factor(var, levels=var)) %>%
+  ggplot(., aes(x = var, y = rel.inf)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  ylim(0,27) +
+  labs(title = "Protozoa Species Richness")
+
+
+```
+
 
 
 
