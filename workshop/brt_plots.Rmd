@@ -14,6 +14,11 @@ library(gbm)
 library(pdp)
 library(cowplot)
 ```
+```{r theme}
+theme_set(theme_minimal())
+```
+
+
 
 ```{r data}
 var_type <- read_csv(here("data/var_type.csv"))
@@ -150,13 +155,17 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 
 ```{r plot by type}
 brt_ri %>% filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
-filter(ranking < 11) %>%
+filter(ranking < 16) %>%
   ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
     geom_line(aes(color = var_type), size = 1) +
     scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
 #    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
     geom_point(aes(color = var_type), size = 10) +
     scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    labs(x = "Parasite Type", 
+         y = "Ranking",
+         shape = "Variable",
+         color = "Variable Type")+
     theme_minimal()
 ```
 
@@ -174,47 +183,68 @@ brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
 which variables are top 5 for each parasite type?
 ```{r}
 brt_ri %>% filter(par_type %in% c("arthropod")) %>% filter(ranking < 6) %>% 
-  arrange(desc(rel.inf)) %>%
+  arrange((rel.inf)) %>%
   mutate(var=factor(var, levels=var)) %>%
-  ggplot(., aes(x = var, y = rel.inf)) + 
+  ggplot(., aes(x = var, y = rel.inf, fill = var_type)) + 
   geom_bar(position = "dodge", stat = "identity") +
+  coord_flip()+
   ylim(0,27) +
-  labs(title = "Arthropod Species Richness")
+  labs(title = "Arthropod Species Richness",
+       fill = "Variable Type") +
+  xlab("Variable") + 
+  ylab("Relative Influence (%)")
 
 brt_ri %>% filter(par_type %in% c("helminth")) %>% filter(ranking < 6) %>% 
-  arrange(desc(rel.inf)) %>%
+  arrange((rel.inf)) %>%
   mutate(var=factor(var, levels=var)) %>%
-  ggplot(., aes(x = var, y = rel.inf)) + 
+  ggplot(., aes(x = var, y = rel.inf, fill = var_type)) + 
   geom_bar(position = "dodge", stat = "identity") +
+    coord_flip()+
   ylim(0,27) +
-  labs(title = "Helminth Species Richness")
+  labs(title = "Helminth Species Richness",
+       fill = "Variable Type") +
+  xlab("Variable") + 
+  ylab("Relative Influence (%)")
 
 
 brt_ri %>% filter(par_type %in% c("virus")) %>% filter(ranking < 6) %>% 
-  arrange(desc(rel.inf)) %>%
+  arrange((rel.inf)) %>%
   mutate(var=factor(var, levels=var)) %>%
-  ggplot(., aes(x = var, y = rel.inf)) + 
-  geom_bar(position = "dodge", stat = "identity") +
+  ggplot(., aes(x = var, y = rel.inf, fill = var_type)) + 
+  geom_bar(position = "dodge", stat = "identity",)+
+    coord_flip()+
   ylim(0,27) +
-  labs(title = "Virus Species Richness")
+  labs(title = "Virus Species Richness",
+       fill = "Variable Type") +
+  xlab("Variable") + 
+  ylab("Relative Influence (%)")
 
 
 brt_ri %>% filter(par_type %in% c("bacteria")) %>% filter(ranking < 6) %>% 
-  arrange(desc(rel.inf)) %>%
+  arrange((rel.inf)) %>%
   mutate(var=factor(var, levels=var)) %>%
-  ggplot(., aes(x = var, y = rel.inf)) + 
+  ggplot(., aes(x = var, y = rel.inf, fill = var_type)) + 
   geom_bar(position = "dodge", stat = "identity") +
+    coord_flip()+
   ylim(0,27) +
-  labs(title = "Bacteria Species Richness")
+  labs(title = "Bacteria Species Richness",
+       fill = "Variable Type") +
+  xlab("Variable") + 
+  ylab("Relative Influence (%)")
 
 
 brt_ri %>% filter(par_type %in% c("protozoa")) %>% filter(ranking < 6) %>% 
-  arrange(desc(rel.inf)) %>%
+  arrange((rel.inf)) %>%
   mutate(var=factor(var, levels=var)) %>%
-  ggplot(., aes(x = var, y = rel.inf)) + 
+  ggplot(., aes(x = var, y = rel.inf, fill = var_type)) + 
   geom_bar(position = "dodge", stat = "identity") +
+    coord_flip()+
   ylim(0,27) +
-  labs(title = "Protozoa Species Richness")
+  labs(title = "Protozoa Species Richness",
+       fill = "Variable Type") +
+  xlab("Variable") + 
+  ylab("Relative Influence (%)")
+
 
 
 ```
@@ -247,8 +277,11 @@ top_vars <- brt_ri %>% filter(var %in% intersect_vars)
 top_vars %>% filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
   group_by(par_type) %>%
   ggplot(.,aes(x = par_type, y = rel.inf, fill = var)) + 
-  geom_bar(position = "stack", stat = "identity") + 
-  theme_minimal()
+  geom_bar(position = "dodge", stat = "identity") + 
+  coord_flip()+
+  labs(x = "Parasite Type",
+       y = "Relative Influence",
+       fill = "Variable")
 ```
 
 
@@ -536,6 +569,15 @@ ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp)
 
 ```
 
+```{r}
+legend <- tibble(par_type = c("Arthropod", "Helminth", "Bacteria", "Virus", "Protozoa"),
+                 x_val = c(1:5),
+                 y_val = c(1:5))
+
+ggplot(legend, aes(x = x_val, y = y_val, color = par_type)) + geom_line(size = 2) + 
+  scale_color_manual(values = c("blue", "hotpink", "red", "purple", "forestgreen")) + labs(color = "Parasite Type")
+
+```
 
 
 
