@@ -175,7 +175,8 @@ gmpd_panth_proto_hosts <- gmpd_panth_proto$MSW_Binomial
 venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts),
              category.names = c("helminth", "virus", "arthropod", "bacteria", "protozoa"),
              filename = here("figures/hosts_overlap.png"),
-             output=T)
+             output=T,
+             margin = 0.1)
 
 
 intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
@@ -411,7 +412,7 @@ summary(brt2_other_helm)
 summary(brt3_other_virus)
 ```
 
-
+Function for mean squared error and root mean square deviation
 ```{r}
 get_mse <- function(model, test) {
   pred <- predict(model, newdata = test, n.trees = model$n.trees)
