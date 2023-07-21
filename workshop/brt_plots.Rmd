@@ -15,6 +15,7 @@ library(pdp)
 library(cowplot)
 library(RColorBrewer)
 library(patchwork)
+library(VennDiagram)
 ```
 
 ```{r theme}
@@ -56,8 +57,11 @@ brt5_elith_bact <- readRDS(here("processed_data/brt_results/bact_elith.rds"))
 brt6_elith_proto <- readRDS(here("processed_data/brt_results/proto_elith.rds"))
 brt7_elith_macro <- readRDS(here("processed_data/brt_results/macro_elith.rds"))
 brt8_elith_micro <- readRDS(here("processed_data/brt_results/micro_elith.rds"))
+```
 
 
+
+```{r}
 summary(brt1_elith_full)
 summary(brt2_elith_helm)
 summary(brt3_elith_virus)

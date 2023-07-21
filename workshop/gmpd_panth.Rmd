@@ -19,6 +19,7 @@ library(here)
 library(dismo)
 library(caret)
 library(gbm)
+library(VennDiagram)
 
 #source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
@@ -169,6 +170,13 @@ gmpd_panth_virus_hosts <- gmpd_panth_virus$MSW_Binomial #get remaining host spec
 gmpd_panth_arth_hosts <- gmpd_panth_arth$MSW_Binomial
 gmpd_panth_bact_hosts <- gmpd_panth_bact$MSW_Binomial
 gmpd_panth_proto_hosts <- gmpd_panth_proto$MSW_Binomial
+
+
+venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts),
+             category.names = c("helminth", "virus", "arthropod", "bacteria", "protozoa"),
+             filename = here("figures/hosts_overlap.png"),
+             output=T)
+
 
 intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
 
