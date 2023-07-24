@@ -14,6 +14,11 @@ library(tidyverse)
 library(magrittr)
 ```
 
+```{r}
+hosts_intersect <- readRDS(here("data/hosts_intersect"))
+```
+
+
 ```{r functions}
 makeMissing <- function(df) {
   tibble(col = names(colSums(is.na(df))), missing = as.numeric(colSums(is.na(df))))

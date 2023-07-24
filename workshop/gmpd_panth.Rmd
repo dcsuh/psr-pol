@@ -181,6 +181,8 @@ venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_
 
 intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
 
+saveRDS(intersect_hosts, here("data/hosts_intersect"))
+
 gmpd_panth_helm %<>% filter(MSW_Binomial %in% intersect_hosts)
 gmpd_panth_virus %<>% filter(MSW_Binomial %in% intersect_hosts)
 gmpd_panth_arth %<>% filter(MSW_Binomial %in% intersect_hosts)
