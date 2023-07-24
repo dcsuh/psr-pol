@@ -168,6 +168,15 @@ panth_missing <- makeMissing(panth1)
 
 plotMissing(panth_missing)
 ```
+```{r}
+panth_subset <- panth1 %>% filter(Binomial %in% hosts_intersect)
+
+panth_subset_missing <- makeMissing(panth_subset)
+
+plotMissing(panth_subset_missing)
+```
+
+
 
 ```{r}
 panth_cols <- tibble(df = "panth",
