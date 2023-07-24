@@ -30,24 +30,32 @@ custom fill and color
 custom_fill <- scale_fill_manual(values = c("anthropogenic" = "blue",
                                             "behavior" = "pink",
                                             "morphology" = "red",
-                                            "pace" = "purple",
+                                            "pace" = "orange",
                                             "environment" = "forestgreen",
-                                            "other" = "orange",
+                                            "other" = "#A93587",
                                             "metabolic" = "yellow",
-                                            "taxonomy" = "turquoise"))
+                                            "taxonomy" = "#004D40",
+                                            "ecology" = "#D81B60",
+                                            "geography" = "#1E88E5",
+                                            "host" = "#FFC107"))
 
 custom_color <- scale_color_manual(values = c("anthropogenic" = "blue",
                                             "behavior" = "pink",
                                             "morphology" = "red",
-                                            "pace" = "purple",
+                                            "pace" = "orange",
                                             "environment" = "forestgreen",
-                                            "other" = "orange",
+                                            "other" = "#A93587",
                                             "metabolic" = "yellow",
-                                            "taxonomy" = "turquoise"))
+                                            "taxonomy" = "#004D40",
+                                            "ecology" = "#D81B60",
+                                            "geography" = "#1E88E5",
+                                            "host" = "#FFC107"))
 ```
 
 ```{r data}
-var_type <- read_csv(here("data/var_type.csv"))
+#var_type <- read_csv(here("data/var_type.csv"))
+var_type <- read_csv(here("data/var_type_alt.csv"))
+
 
 brt1_elith_full <- readRDS(here("processed_data/brt_results/full_elith.rds"))
 brt2_elith_helm <- readRDS(here("processed_data/brt_results/helm_elith.rds"))
