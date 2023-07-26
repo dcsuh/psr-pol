@@ -290,46 +290,46 @@ names_mat %>% ggplot(.,aes(para_yes)) + geom_histogram()
 
 ```{r, eval = F}
 library(VennDiagram)
-
-venn.diagram(x = list(amn_mamm_names, gmpd_names, clover_names),
-             category.names = c("amniote", "gmpd", "clover"),
-             filename = "amniote_overlap.png",
-             output=T)
-
-venn.diagram(x = list(ani_mamm_names, gmpd_names, clover_names),
-             category.names = c("animalTraits", "gmpd", "clover"),
-             filename = "animalTraits_overlap.png",
-             output=T)
-
-venn.diagram(x = list(elton_names, gmpd_names, clover_names),
-             category.names = c("Elton", "gmpd", "clover"),
-             filename = "elton_overlap.png",
-             output=T)
-
-venn.diagram(x = list(horm_mamm_names, gmpd_names, clover_names),
-             category.names = c("hormone", "gmpd", "clover"),
-             filename = "hormone_overlap.png",
-             output=T)
-
-venn.diagram(x = list(panth_names, gmpd_names, clover_names),
-             category.names = c("Pantheria", "gmpd", "clover"),
-             filename = "panth_overlap.png",
-             output=T)
-
-venn.diagram(x = list(amn_mamm_names, elton_names, panth_names),
-             category.names = c("amniote", "elton", "pantheria"),
-             filename = "hosts_overlap.png",
-             output=T)
-
-venn.diagram(x = list(amn_mamm_names, elton_names, panth_names, clover_names),
-             category.names = c("amniote", "elton", "pantheria", "clover"),
-             filename = "hosts_clover_overlap.png",
-             output=T)
-
-venn.diagram(x = list(panth_subset_names, panth_names),
-             category.names = c("gmpd_subset", "PanTHERIA"),
-             filename = here("workshop/venn_diagrams/gmpd_panth_subset_overlap.png"),
-             output=T)
+# 
+# venn.diagram(x = list(amn_mamm_names, gmpd_names, clover_names),
+#              category.names = c("amniote", "gmpd", "clover"),
+#              filename = "amniote_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(ani_mamm_names, gmpd_names, clover_names),
+#              category.names = c("animalTraits", "gmpd", "clover"),
+#              filename = "animalTraits_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(elton_names, gmpd_names, clover_names),
+#              category.names = c("Elton", "gmpd", "clover"),
+#              filename = "elton_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(horm_mamm_names, gmpd_names, clover_names),
+#              category.names = c("hormone", "gmpd", "clover"),
+#              filename = "hormone_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(panth_names, gmpd_names, clover_names),
+#              category.names = c("Pantheria", "gmpd", "clover"),
+#              filename = "panth_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(amn_mamm_names, elton_names, panth_names),
+#              category.names = c("amniote", "elton", "pantheria"),
+#              filename = "hosts_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(amn_mamm_names, elton_names, panth_names, clover_names),
+#              category.names = c("amniote", "elton", "pantheria", "clover"),
+#              filename = "hosts_clover_overlap.png",
+#              output=T)
+# 
+# venn.diagram(x = list(panth_subset_names, panth_names),
+#              category.names = c("gmpd_subset", "PanTHERIA"),
+#              filename = here("workshop/venn_diagrams/gmpd_panth_subset_overlap.png"),
+#              output=T)
 
 ```
 
