@@ -326,8 +326,8 @@ venn.diagram(x = list(amn_mamm_names, elton_names, panth_names, clover_names),
              filename = "hosts_clover_overlap.png",
              output=T)
 
-venn.diagram(x = list(panth_subset_names, gmpd_names),
-             category.names = c("Pantheria", "gmpd"),
+venn.diagram(x = list(panth_subset_names, panth_names),
+             category.names = c("gmpd_subset", "PanTHERIA"),
              filename = here("workshop/venn_diagrams/gmpd_panth_subset_overlap.png"),
              output=T)
 

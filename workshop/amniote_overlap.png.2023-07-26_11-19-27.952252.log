@@ -1,0 +1,12 @@
+INFO [2023-07-26 11:19:27] $x
+INFO [2023-07-26 11:19:27] list(amn_mamm_names, gmpd_names, clover_names)
+INFO [2023-07-26 11:19:27] 
+INFO [2023-07-26 11:19:27] $category.names
+INFO [2023-07-26 11:19:27] c("amniote", "gmpd", "clover")
+INFO [2023-07-26 11:19:27] 
+INFO [2023-07-26 11:19:27] $filename
+INFO [2023-07-26 11:19:27] [1] "amniote_overlap.png"
+INFO [2023-07-26 11:19:27] 
+INFO [2023-07-26 11:19:27] $output
+INFO [2023-07-26 11:19:27] T
+INFO [2023-07-26 11:19:27] 
