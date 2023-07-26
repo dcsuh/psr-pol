@@ -1,0 +1,12 @@
+INFO [2023-07-26 11:18:17] $x
+INFO [2023-07-26 11:18:17] list(panth_subset_names, panth_names)
+INFO [2023-07-26 11:18:17] 
+INFO [2023-07-26 11:18:17] $category.names
+INFO [2023-07-26 11:18:17] c("gmpd", "PanTHERIA")
+INFO [2023-07-26 11:18:17] 
+INFO [2023-07-26 11:18:17] $filename
+INFO [2023-07-26 11:18:17] here("workshop/venn_diagrams/gmpd_panth_subset_overlap.png")
+INFO [2023-07-26 11:18:17] 
+INFO [2023-07-26 11:18:17] $output
+INFO [2023-07-26 11:18:17] T
+INFO [2023-07-26 11:18:17] 
