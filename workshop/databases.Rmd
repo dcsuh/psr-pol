@@ -260,6 +260,7 @@ horm_mamm_names <- tolower(unique(horm_mamm$Species))
 panth_names <- tolower(unique(panth1$Binomial))
 gmpd_names <- tolower(unique(gmpd$HostCorrectedName))
 clover_names <- tolower(unique(mammals$Host))
+panth_subset_names <- tolower(unique(panth_subset$Binomial))
 
 all_host_names <- unique(c(amn_mamm_names, ani_mamm_names, elton_names, horm_mamm_names, panth_names, gmpd_names, clover_names))
 
@@ -325,6 +326,10 @@ venn.diagram(x = list(amn_mamm_names, elton_names, panth_names, clover_names),
              filename = "hosts_clover_overlap.png",
              output=T)
 
+venn.diagram(x = list(panth_subset_names, gmpd_names),
+             category.names = c("Pantheria", "gmpd"),
+             filename = here("workshop/venn_diagrams/gmpd_panth_subset_overlap.png"),
+             output=T)
 
 ```
 
