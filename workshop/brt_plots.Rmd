@@ -200,8 +200,9 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 ```{r plot by type}
 brt_ri %<>% mutate(top_fifteen = ifelse(ranking < 16, 1, 0))
 
-subway <- brt_ri %>% filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
-filter(top_fifteen == T) %>%
+
+subway_full <- brt_ri %>% filter(top_fifteen == T) %>%
+  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
   ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
     geom_line(aes(color = var_type), size = 1) +
     scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
@@ -213,6 +214,22 @@ filter(top_fifteen == T) %>%
          shape = "Variable",
          color = "Variable Type")+
     theme_minimal() +
+  custom_color
+
+subway_intersect <- brt_ri %>% filter(top_fifteen == T) %>% 
+  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
+  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
+    geom_line(aes(color = var_type, alpha = top_intersect+0.2), size = 1) +
+    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
+#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
+    geom_point(aes(color = var_type, alpha = top_intersect+0.2), size = 10) +
+    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    labs(x = "Parasite Type", 
+         y = "Ranking",
+         shape = "Variable",
+         color = "Variable Type")+
+    theme_minimal() +
+  scale_alpha(guide = "none") +
   custom_color
 
 ```
