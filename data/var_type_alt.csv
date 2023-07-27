@@ -1,9 +1,9 @@
 variable,var_type
-MSW_Order,taxonomy
-MSW_Family,taxonomy
-MSW_Genus,taxonomy
-MSW_Species,taxonomy
-MSW_Binomial,taxonomy
+MSW_Order,other
+MSW_Family,other
+MSW_Genus,other
+MSW_Species,other
+MSW_Binomial,other
 ActivityCycle,host
 AdultBodyMass_g,host
 AdultForearmLen_mm,host
