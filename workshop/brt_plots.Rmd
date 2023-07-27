@@ -50,6 +50,13 @@ custom_color <- scale_color_manual(values = c("anthropogenic" = "blue",
                                             "ecology" = "#D81B60",
                                             "geography" = "#1E88E5",
                                             "host" = "#FFC107"))
+
+custom_par_fill <- scale_fill_manual(values = c("helminth" = "red",
+                                                  "arthropod" = "blue",
+                                                  "virus" = "forestgreen",
+                                                  "bacteria" = "hotpink",
+                                                  "protozoa" = "purple"))
+
 ```
 
 ```{r data}
@@ -349,6 +356,19 @@ brt_ri %>% filter(top_intersect == T) %>%
   labs(x = "Parasite Type",
        y = "Relative Influence",
        fill = "Variable")
+
+brt_ri %>% filter(top_intersect == T) %>% 
+  filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  filter(var != "ref_count") %>%
+  group_by(var) %>%
+  ggplot(.,aes(x = var, y = rel.inf, fill = par_type)) + 
+  geom_bar(position = "dodge", stat = "identity") + 
+  custom_par_fill + 
+  coord_flip()+
+  labs(x = "Variable",
+       y = "Relative Influence",
+       fill = "Parasite Type")
+
 ```
 
 
