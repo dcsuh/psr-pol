@@ -365,9 +365,10 @@ brt_ri %>% filter(top_intersect == T) %>%
   geom_bar(position = "dodge", stat = "identity") + 
   custom_par_fill + 
   coord_flip()+
-  labs(x = "Variable",
+  labs(x = " ",
        y = "Relative Influence",
-       fill = "Parasite Type")
+       fill = "Parasite Type") 
+#+ theme(axis.text.y = element_blank())
 
 ```
 
