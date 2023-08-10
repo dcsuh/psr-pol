@@ -33,6 +33,8 @@ refs <- read_csv(here("data/google_refs.csv"))
 ```
 
 
+
+
 ```{r make taxa dummy variables}
 dummy_gmpd <- dummyVars(~ HostOrder, data = gmpd)
 gmpd_updated <- as_tibble(predict(dummy_gmpd, newdata = gmpd))

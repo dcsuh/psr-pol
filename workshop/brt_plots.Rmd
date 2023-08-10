@@ -603,7 +603,9 @@ brt5_range_plot <- make_plots(brt5_elith_bact,
 brt6_range_plot <- make_plots(brt6_elith_proto, 
                                  "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "protozoa")
 
+
 ```
+
 
 
 ```{r}

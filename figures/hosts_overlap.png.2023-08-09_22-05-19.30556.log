@@ -1,0 +1,16 @@
+INFO [2023-08-09 22:05:19] $x
+INFO [2023-08-09 22:05:19] list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, 
+INFO [2023-08-09 22:05:19]     gmpd_panth_bact_hosts, gmpd_panth_proto_hosts)
+INFO [2023-08-09 22:05:19] 
+INFO [2023-08-09 22:05:19] $category.names
+INFO [2023-08-09 22:05:19] c("helminth", "virus", "arthropod", "bacteria", "protozoa")
+INFO [2023-08-09 22:05:19] 
+INFO [2023-08-09 22:05:19] $filename
+INFO [2023-08-09 22:05:19] here("figures/hosts_overlap.png")
+INFO [2023-08-09 22:05:19] 
+INFO [2023-08-09 22:05:19] $output
+INFO [2023-08-09 22:05:19] T
+INFO [2023-08-09 22:05:19] 
+INFO [2023-08-09 22:05:19] $margin
+INFO [2023-08-09 22:05:19] [1] 0.1
+INFO [2023-08-09 22:05:19] 
