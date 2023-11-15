@@ -198,13 +198,16 @@ combine_missing <- makeMissing(combine)
 plotMissing(combine_missing)
 ```
 
-
+```{r}
+combine_cols <- tibble(df = "combine",
+                     variable = colnames(combine))
+```
 
 
 Life history data variables compiled
 
 ```{r}
-all_cols <- rbind(amniote_cols, animal_cols, elton_cols, hormone_cols, panth_cols)
+all_cols <- rbind(amniote_cols, animal_cols, elton_cols, hormone_cols, panth_cols, combine_cols)
 
 write_csv(all_cols, here("processed_data", "traitnames.csv"))
 ```
