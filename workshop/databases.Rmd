@@ -356,9 +356,4 @@ Amniote, Elton, and Panth share 336 hosts with both gmpd and clover and about 66
 
 
 
-```{r}
-
-```
-
-
 
