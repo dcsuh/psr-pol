@@ -115,14 +115,16 @@ brt7_names <- brt7_elith_macro$var.names
 brt8_names <- brt8_elith_micro$var.names
 
 
-brt1_long_plot_no <- which(brt1_names %in% c("MaxLongevity_m"))
-brt2_long_plot_no <- which(brt2_names %in% c("MaxLongevity_m"))
-brt3_long_plot_no <- which(brt3_names %in% c("MaxLongevity_m"))
-brt4_long_plot_no <- which(brt4_names %in% c("MaxLongevity_m"))
-brt5_long_plot_no <- which(brt5_names %in% c("MaxLongevity_m"))
-brt6_long_plot_no <- which(brt6_names %in% c("MaxLongevity_m"))
-brt7_long_plot_no <- which(brt7_names %in% c("MaxLongevity_m"))
-brt8_long_plot_no <- which(brt8_names %in% c("MaxLongevity_m"))
+var_name <- c("max_longevity_d")
+
+brt1_long_plot_no <- which(brt1_names %in% var_name)
+brt2_long_plot_no <- which(brt2_names %in% var_name)
+brt3_long_plot_no <- which(brt3_names %in% var_name)
+brt4_long_plot_no <- which(brt4_names %in% var_name)
+brt5_long_plot_no <- which(brt5_names %in% var_name)
+brt6_long_plot_no <- which(brt6_names %in% var_name)
+brt7_long_plot_no <- which(brt7_names %in% var_name)
+brt8_long_plot_no <- which(brt8_names %in% var_name)
 
 
 gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "full")
@@ -491,16 +493,16 @@ pdp_draw <- function(mod1,mod2,mod3,mod4,mod5, hist_x=0.05, pdp_x=-0.03, hist_sc
 
 ```{r make pdp plots}
 max_long_y <- c(3,28)
-brt1_plots_max_long <- make_plots(brt1_elith_full, "MaxLongevity_m")
-brt2_plots_max_long <- make_plots(brt2_elith_helm, "MaxLongevity_m", y_fixed = T, y_axis = max_long_y, 
+brt1_plots_max_long <- make_plots(brt1_elith_full, var_name)
+brt2_plots_max_long <- make_plots(brt2_elith_helm, var_name, y_fixed = T, y_axis = max_long_y, 
                                   par_type = "helminth")
-brt3_plots_max_long <- make_plots(brt3_elith_virus, "MaxLongevity_m", y_fixed = T, y_axis = max_long_y, 
+brt3_plots_max_long <- make_plots(brt3_elith_virus, var_name, y_fixed = T, y_axis = max_long_y, 
                                   par_type = "virus")
-brt4_plots_max_long <- make_plots(brt4_elith_arth, "MaxLongevity_m", y_fixed = T, y_axis = max_long_y, 
+brt4_plots_max_long <- make_plots(brt4_elith_arth, var_name, y_fixed = T, y_axis = max_long_y, 
                                   par_type = "arthropod")
-brt5_plots_max_long <- make_plots(brt5_elith_bact, "MaxLongevity_m", y_fixed = T, y_axis = max_long_y, 
+brt5_plots_max_long <- make_plots(brt5_elith_bact, var_name, y_fixed = T, y_axis = max_long_y, 
                                   par_type = "bacteria")
-brt6_plots_max_long <- make_plots(brt6_elith_proto, "MaxLongevity_m", y_fixed = T, y_axis = max_long_y, 
+brt6_plots_max_long <- make_plots(brt6_elith_proto, var_name, y_fixed = T, y_axis = max_long_y, 
                                   par_type = "protozoa")
 ```
 
@@ -557,16 +559,18 @@ ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp)
 ```{r}
 maturity_y <- c(5,32)
 
+var_name1 <- "maturity_d"
+
 brt2_maturity_plot <- make_plots(brt2_elith_helm, 
-                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "helminth")
+                                 var_name1, y_fixed = T, y_axis = maturity_y, par_type = "helminth")
 brt3_maturity_plot <- make_plots(brt3_elith_virus, 
-                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "virus")
+                                 var_name1, y_fixed = T, y_axis = maturity_y, par_type = "virus")
 brt4_maturity_plot <- make_plots(brt4_elith_arth, 
-                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "arthropod")
+                                 var_name1, y_fixed = T, y_axis = maturity_y, par_type = "arthropod")
 brt5_maturity_plot <- make_plots(brt5_elith_bact, 
-                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "bacteria")
+                                 var_name1, y_fixed = T, y_axis = maturity_y, par_type = "bacteria")
 brt6_maturity_plot <- make_plots(brt6_elith_proto, 
-                                 "SexualMaturityAge_d", y_fixed = T, y_axis = maturity_y, par_type = "protozoa")
+                                 var_name1, y_fixed = T, y_axis = maturity_y, par_type = "protozoa")
 
 ```
 
@@ -592,16 +596,18 @@ ggsave(here("figures/pdp/sexual_maturity.png"), maturity_pdp)
 ```{r}
 range_y <- c(5,30)
 
+var_name2 <- "dispersal_km"
+
 brt2_range_plot <- make_plots(brt2_elith_helm, 
-                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "helminth")
+                                 var_name2, y_fixed = T, y_axis = range_y, par_type = "helminth")
 brt3_range_plot <- make_plots(brt3_elith_virus, 
-                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "virus")
+                                 var_name2, y_fixed = T, y_axis = range_y, par_type = "virus")
 brt4_range_plot <- make_plots(brt4_elith_arth, 
-                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "arthropod")
+                                 var_name2, y_fixed = T, y_axis = range_y, par_type = "arthropod")
 brt5_range_plot <- make_plots(brt5_elith_bact, 
-                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "bacteria")
+                                 var_name2, y_fixed = T, y_axis = range_y, par_type = "bacteria")
 brt6_range_plot <- make_plots(brt6_elith_proto, 
-                                 "HomeRange_km", y_fixed = T, y_axis = range_y, par_type = "protozoa")
+                                 var_name2, y_fixed = T, y_axis = range_y, par_type = "protozoa")
 
 
 ```
@@ -629,16 +635,18 @@ ggsave(here("figures/pdp/home_range.png"), range_pdp)
 ```{r}
 area_y <- c(5,26)
 
+var_name3 <- "density_n_km2"
+
 brt2_area_plot <- make_plots(brt2_elith_helm, 
-                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "helminth")
+                                 var_name3, y_fixed = T, y_axis = area_y, par_type = "helminth")
 brt3_area_plot <- make_plots(brt3_elith_virus, 
-                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "virus")
+                                 var_name3, y_fixed = T, y_axis = area_y, par_type = "virus")
 brt4_area_plot <- make_plots(brt4_elith_arth, 
-                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "arthropod")
+                                 var_name3, y_fixed = T, y_axis = area_y, par_type = "arthropod")
 brt5_area_plot <- make_plots(brt5_elith_bact, 
-                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "bacteria")
+                                 var_name3, y_fixed = T, y_axis = area_y, par_type = "bacteria")
 brt6_area_plot <- make_plots(brt6_elith_proto, 
-                                 "GR_Area_km", y_fixed = T, y_axis = area_y, par_type = "protozoa")
+                                 var_name3, y_fixed = T, y_axis = area_y, par_type = "protozoa")
 
 ```
 
@@ -664,16 +672,18 @@ ggsave(here("figures/pdp/gr_area.png"), area_pdp)
 ```{r}
 pop_dens_y <- c(5,30)
 
-brt2_pop_dens_plot <- make_plots(brt2_elith_helm, 
-                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "helminth")
-brt3_pop_dens_plot <- make_plots(brt3_elith_virus, 
-                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "virus")
-brt4_pop_dens_plot <- make_plots(brt4_elith_arth, 
-                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "arthropod")
-brt5_pop_dens_plot <- make_plots(brt5_elith_bact, 
-                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "bacteria")
-brt6_pop_dens_plot <- make_plots(brt6_elith_proto, 
-                                 "HuPopDen_Mean_n_km", y_fixed = T, y_axis = pop_dens_y, par_type = "protozoa")
+var_name4 <- "weaning_mass_g"
+
+brt2_pop_dens_plot <- make_plots(brt2_elith_helm,
+                                 var_name4, y_fixed = T, y_axis = pop_dens_y, par_type = "helminth")
+brt3_pop_dens_plot <- make_plots(brt3_elith_virus,
+                                 var_name4, y_fixed = T, y_axis = pop_dens_y, par_type = "virus")
+brt4_pop_dens_plot <- make_plots(brt4_elith_arth,
+                                 var_name4, y_fixed = T, y_axis = pop_dens_y, par_type = "arthropod")
+brt5_pop_dens_plot <- make_plots(brt5_elith_bact,
+                                 var_name4, y_fixed = T, y_axis = pop_dens_y, par_type = "bacteria")
+brt6_pop_dens_plot <- make_plots(brt6_elith_proto,
+                                 var_name4, y_fixed = T, y_axis = pop_dens_y, par_type = "protozoa")
 
 ```
 

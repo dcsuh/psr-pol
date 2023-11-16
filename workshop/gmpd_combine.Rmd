@@ -341,14 +341,14 @@ summary(brt7_elith_macro)
 summary(brt8_elith_micro)
 
 
-# saveRDS(brt1_elith_full, file = here("processed_data/brt_results/full_elith.rds"))
-# saveRDS(brt2_elith_helm, file = here("processed_data/brt_results/helm_elith.rds"))
-# saveRDS(brt3_elith_virus, file = here("processed_data/brt_results/virus_elith.rds"))
-# saveRDS(brt4_elith_arth, file = here("processed_data/brt_results/arth_elith.rds"))
-# saveRDS(brt5_elith_bact, file = here("processed_data/brt_results/bact_elith.rds"))
-# saveRDS(brt6_elith_proto, file = here("processed_data/brt_results/proto_elith.rds"))
-# saveRDS(brt7_elith_macro, file = here("processed_data/brt_results/macro_elith.rds"))
-# saveRDS(brt8_elith_micro, file = here("processed_data/brt_results/micro_elith.rds"))
+saveRDS(brt1_elith_full, file = here("processed_data/brt_results/full_elith.rds"))
+saveRDS(brt2_elith_helm, file = here("processed_data/brt_results/helm_elith.rds"))
+saveRDS(brt3_elith_virus, file = here("processed_data/brt_results/virus_elith.rds"))
+saveRDS(brt4_elith_arth, file = here("processed_data/brt_results/arth_elith.rds"))
+saveRDS(brt5_elith_bact, file = here("processed_data/brt_results/bact_elith.rds"))
+saveRDS(brt6_elith_proto, file = here("processed_data/brt_results/proto_elith.rds"))
+saveRDS(brt7_elith_macro, file = here("processed_data/brt_results/macro_elith.rds"))
+saveRDS(brt8_elith_micro, file = here("processed_data/brt_results/micro_elith.rds"))
 
 ```
 
