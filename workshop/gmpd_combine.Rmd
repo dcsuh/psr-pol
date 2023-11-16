@@ -31,7 +31,7 @@ gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_csv(here("data/panth_subset.csv"))
 refs <- read_csv(here("data/google_refs.csv"))
 
-combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_imputed.csv"))
+combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_reported.csv"))
 ```
 
 
