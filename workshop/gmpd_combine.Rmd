@@ -58,16 +58,23 @@ gmpd_PSR <- gmpd %>% filter(ParType %in% c("Helminth", "Virus")) %>% dplyr::sele
   summarize(psr=n())
 gmpd_PSR %<>% inner_join(., gmpd_dummy_vars)
 panth %<>% mutate(HostCorrectedName = MSW_Binomial)
-# gmpd_panth <- gmpd_PSR %>% inner_join(panth, by="HostCorrectedName")
-# gmpd_panth %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+
 ```
+
+
+```{r}
+select_out <- function(df) {
+  dplyr::select(df, -c(HostCorrectedName, order:phylacine_binomial, 
+                                 foraging_stratum, island_endemicity, biogeographical_realm, adult_forearm_length_mm))
+}
+```
+
 
 
 ```{r gmpd psr}
 combine %<>% mutate(HostCorrectedName = iucn2020_binomial)
 gmpd_panth <- gmpd_PSR %>% inner_join(combine, by="HostCorrectedName")
-gmpd_panth %<>% dplyr::select(-c(HostCorrectedName, order:phylacine_binomial, 
-                                 foraging_stratum, island_endemicity, biogeographical_realm, adult_forearm_length_mm))
+gmpd_panth %<>% select_out()
 ```
 
 Prepare data by partitioning
@@ -166,43 +173,43 @@ gmpd_micro %<>% inner_join(., gmpd_dummy_vars)
 
 
 ```{r join name}
-gmpd_panth_helm <- as.data.frame(gmpd_helm %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_virus <- as.data.frame(gmpd_virus %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_arth <- as.data.frame(gmpd_arth %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_bact <- as.data.frame(gmpd_bact %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_proto <- as.data.frame(gmpd_proto %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(panth, by="HostCorrectedName"))
-gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(panth, by="HostCorrectedName"))
+gmpd_panth_helm <- as.data.frame(gmpd_helm %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_virus <- as.data.frame(gmpd_virus %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_arth <- as.data.frame(gmpd_arth %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_bact <- as.data.frame(gmpd_bact %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_proto <- as.data.frame(gmpd_proto %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(combine, by="HostCorrectedName"))
 ```
 
 Use only hosts that overlap
 ```{r}
-gmpd_panth_helm_hosts <- gmpd_panth_helm$MSW_Binomial #get all host species from macro database
-gmpd_panth_virus_hosts <- gmpd_panth_virus$MSW_Binomial #get remaining host species from micro database
-gmpd_panth_arth_hosts <- gmpd_panth_arth$MSW_Binomial
-gmpd_panth_bact_hosts <- gmpd_panth_bact$MSW_Binomial
-gmpd_panth_proto_hosts <- gmpd_panth_proto$MSW_Binomial
+gmpd_panth_helm_hosts <- gmpd_panth_helm$iucn2020_binomial #get all host species from macro database
+gmpd_panth_virus_hosts <- gmpd_panth_virus$iucn2020_binomial #get remaining host species from micro database
+gmpd_panth_arth_hosts <- gmpd_panth_arth$iucn2020_binomial
+gmpd_panth_bact_hosts <- gmpd_panth_bact$iucn2020_binomial
+gmpd_panth_proto_hosts <- gmpd_panth_proto$iucn2020_binomial
 
 
-venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts),
-             category.names = c("helminth", "virus", "arthropod", "bacteria", "protozoa"),
-             filename = here("figures/hosts_overlap.png"),
-             output=T,
-             margin = 0.1)
+# venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts),
+#              category.names = c("helminth", "virus", "arthropod", "bacteria", "protozoa"),
+#              filename = here("figures/hosts_overlap.png"),
+#              output=T,
+#              margin = 0.1)
 
 
 intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
 
-saveRDS(intersect_hosts, here("data/hosts_intersect"))
+#saveRDS(intersect_hosts, here("data/hosts_intersect"))
 
-gmpd_panth_helm %<>% filter(MSW_Binomial %in% intersect_hosts)
-gmpd_panth_virus %<>% filter(MSW_Binomial %in% intersect_hosts)
-gmpd_panth_arth %<>% filter(MSW_Binomial %in% intersect_hosts)
-gmpd_panth_bact %<>% filter(MSW_Binomial %in% intersect_hosts)
-gmpd_panth_proto %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_helm %<>% filter(iucn2020_binomial %in% intersect_hosts)
+gmpd_panth_virus %<>% filter(iucn2020_binomial %in% intersect_hosts)
+gmpd_panth_arth %<>% filter(iucn2020_binomial %in% intersect_hosts)
+gmpd_panth_bact %<>% filter(iucn2020_binomial %in% intersect_hosts)
+gmpd_panth_proto %<>% filter(iucn2020_binomial %in% intersect_hosts)
 
-gmpd_panth_macro %<>% filter(MSW_Binomial %in% intersect_hosts)
-gmpd_panth_micro %<>% filter(MSW_Binomial %in% intersect_hosts)
+gmpd_panth_macro %<>% filter(iucn2020_binomial %in% intersect_hosts)
+gmpd_panth_micro %<>% filter(iucn2020_binomial %in% intersect_hosts)
 ```
 
 
@@ -219,49 +226,49 @@ test <- as.integer(test$row_num)
 
 
 ```{r}
-gmpd_panth_helm %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_helm %<>% select_out()
 
 gmpd_panth_helm_train <- gmpd_panth_helm[train,]
 gmpd_panth_helm_test <- gmpd_panth_helm[test,]
 ```
 
 ```{r}
-gmpd_panth_arth %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_arth %<>% select_out()
 
 gmpd_panth_arth_train <- gmpd_panth_arth[train,]
 gmpd_panth_arth_test <- gmpd_panth_arth[test,]
 ```
 
 ```{r}
-gmpd_panth_virus %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_virus %<>% select_out()
 
 gmpd_panth_virus_train <- gmpd_panth_virus[train,]
 gmpd_panth_virus_test <- gmpd_panth_virus[test,]
 ```
 
 ```{r}
-gmpd_panth_bact %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_bact %<>% select_out()
 
 gmpd_panth_bact_train <- gmpd_panth_bact[train,]
 gmpd_panth_bact_test <- gmpd_panth_bact[test,]
 ```
 
 ```{r}
-gmpd_panth_proto %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_proto %<>% select_out()
 
 gmpd_panth_proto_train <- gmpd_panth_proto[train,]
 gmpd_panth_proto_test <- gmpd_panth_proto[test,]
 ```
 
 ```{r}
-gmpd_panth_macro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_macro %<>% select_out()
 
 gmpd_panth_macro_train <- gmpd_panth_macro[train,]
 gmpd_panth_macro_test <- gmpd_panth_macro[test,]
 ```
 
 ```{r}
-gmpd_panth_micro %<>% dplyr::select(-c(HostCorrectedName, MSW_Order, MSW_Binomial))
+gmpd_panth_micro %<>% select_out()
 
 gmpd_panth_micro_train <- gmpd_panth_micro[train,]
 gmpd_panth_micro_test <- gmpd_panth_micro[test,]
@@ -371,12 +378,14 @@ brt4_names <- brt4_elith_arth$var.names
 brt5_names <- brt5_elith_bact$var.names
 brt6_names <- brt6_elith_proto$var.names
 
-brt1_long_plot_no <- which(brt1_names %in% c("MaxLongevity_m"))
-brt2_long_plot_no <- which(brt2_names %in% c("MaxLongevity_m"))
-brt3_long_plot_no <- which(brt3_names %in% c("MaxLongevity_m"))
-brt4_long_plot_no <- which(brt4_names %in% c("MaxLongevity_m"))
-brt5_long_plot_no <- which(brt5_names %in% c("MaxLongevity_m"))
-brt6_long_plot_no <- which(brt6_names %in% c("MaxLongevity_m"))
+var_name <- c("max_longevity_d")
+
+brt1_long_plot_no <- which(brt1_names %in% var_name)
+brt2_long_plot_no <- which(brt2_names %in% var_name)
+brt3_long_plot_no <- which(brt3_names %in% var_name)
+brt4_long_plot_no <- which(brt4_names %in% var_name)
+brt5_long_plot_no <- which(brt5_names %in% var_name)
+brt6_long_plot_no <- which(brt6_names %in% var_name)
 
 gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "full")
 gbm.plot(brt2_elith_helm, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "helm")
