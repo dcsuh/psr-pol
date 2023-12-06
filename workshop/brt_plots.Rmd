@@ -4,7 +4,7 @@ output: html_document
 date: "2023-07-14"
 ---
 
-```{r packages}
+```{r packages, message = F}
 library(here)
 library(tidyverse)
 library(magrittr)
