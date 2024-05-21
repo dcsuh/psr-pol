@@ -31,7 +31,7 @@ gmpd <- read_csv(here("data/GMPD_main.csv"))
 panth <- read_csv(here("data/panth_subset.csv"))
 refs <- read_csv(here("data/google_refs.csv"))
 
-combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_reported.csv"))
+combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_imputed.csv"))
 ```
 
 
@@ -64,17 +64,19 @@ panth %<>% mutate(HostCorrectedName = MSW_Binomial)
 
 ```{r}
 select_out <- function(df) {
-  dplyr::select(df, -c(HostCorrectedName, order:phylacine_binomial, 
-                                 foraging_stratum, island_endemicity, biogeographical_realm, adult_forearm_length_mm))
+  dplyr::select(df, -c(HostCorrectedName, order:phylacine_binomial, adult_forearm_length_mm, biogeographical_realm))
 }
 ```
-
 
 
 ```{r gmpd psr}
 combine %<>% mutate(HostCorrectedName = iucn2020_binomial)
 gmpd_panth <- gmpd_PSR %>% inner_join(combine, by="HostCorrectedName")
 gmpd_panth %<>% select_out()
+
+gmpd_panth %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 ```
 
 Prepare data by partitioning
@@ -228,12 +230,20 @@ test <- as.integer(test$row_num)
 ```{r}
 gmpd_panth_helm %<>% select_out()
 
+gmpd_panth_helm %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_helm %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_helm %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+
 gmpd_panth_helm_train <- gmpd_panth_helm[train,]
 gmpd_panth_helm_test <- gmpd_panth_helm[test,]
 ```
 
 ```{r}
 gmpd_panth_arth %<>% select_out()
+
+gmpd_panth_arth %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_arth %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_arth %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 
 gmpd_panth_arth_train <- gmpd_panth_arth[train,]
 gmpd_panth_arth_test <- gmpd_panth_arth[test,]
@@ -242,12 +252,20 @@ gmpd_panth_arth_test <- gmpd_panth_arth[test,]
 ```{r}
 gmpd_panth_virus %<>% select_out()
 
+gmpd_panth_virus %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_virus %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_virus %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+
 gmpd_panth_virus_train <- gmpd_panth_virus[train,]
 gmpd_panth_virus_test <- gmpd_panth_virus[test,]
 ```
 
 ```{r}
 gmpd_panth_bact %<>% select_out()
+
+gmpd_panth_bact %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_bact %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_bact %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 
 gmpd_panth_bact_train <- gmpd_panth_bact[train,]
 gmpd_panth_bact_test <- gmpd_panth_bact[test,]
@@ -256,6 +274,10 @@ gmpd_panth_bact_test <- gmpd_panth_bact[test,]
 ```{r}
 gmpd_panth_proto %<>% select_out()
 
+gmpd_panth_proto %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_proto %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_proto %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+
 gmpd_panth_proto_train <- gmpd_panth_proto[train,]
 gmpd_panth_proto_test <- gmpd_panth_proto[test,]
 ```
@@ -263,12 +285,20 @@ gmpd_panth_proto_test <- gmpd_panth_proto[test,]
 ```{r}
 gmpd_panth_macro %<>% select_out()
 
+gmpd_panth_macro %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_macro %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_macro %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+
 gmpd_panth_macro_train <- gmpd_panth_macro[train,]
 gmpd_panth_macro_test <- gmpd_panth_macro[test,]
 ```
 
 ```{r}
 gmpd_panth_micro %<>% select_out()
+
+gmpd_panth_micro %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+gmpd_panth_micro %<>% mutate(island_endemicity = as.factor(island_endemicity))
+# gmpd_panth_micro %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 
 gmpd_panth_micro_train <- gmpd_panth_micro[train,]
 gmpd_panth_micro_test <- gmpd_panth_micro[test,]

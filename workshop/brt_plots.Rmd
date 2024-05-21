@@ -557,7 +557,7 @@ ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp)
 ```
 
 ```{r}
-maturity_y <- c(5,32)
+maturity_y <- c(0,30)
 
 var_name1 <- "maturity_d"
 
@@ -594,9 +594,9 @@ ggsave(here("figures/pdp/sexual_maturity.png"), maturity_pdp)
 ```
 
 ```{r}
-range_y <- c(5,30)
+range_y <- c(5,25)
 
-var_name2 <- "dispersal_km"
+var_name2 <- "home_range_km2"
 
 brt2_range_plot <- make_plots(brt2_elith_helm, 
                                  var_name2, y_fixed = T, y_axis = range_y, par_type = "helminth")
@@ -705,6 +705,8 @@ pop_dens_pdp
 ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp)
 
 ```
+
+
 
 ```{r}
 legend <- tibble(par_type = c("Arthropod", "Helminth", "Bacteria", "Virus", "Protozoa"),
