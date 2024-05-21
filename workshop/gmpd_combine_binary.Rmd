@@ -28,9 +28,8 @@ library(VennDiagram)
 Read in data. To start, we are focusing on gmpd and pantheria
 
 ```{r read}
-gmpd <- read_csv(here("data/GMPD/GMPD_main.csv"))
-gmpd_traits <- read_csv(here("data", "GMPD", "GMPD_parasite_traits.csv"))
-panth <- read_csv(here("data/panth_subset.csv"))
+gmpd <- read_csv(here("data/GMPD_main.csv"))
+#panth <- read_csv(here("data/panth_subset.csv"))
 refs <- read_csv(here("data/google_refs.csv"))
 
 combine <- read_csv(here("data/combine/COMBINE_archives/trait_data_imputed.csv"))
@@ -54,12 +53,14 @@ gmpd_dummy_vars %<>% left_join(.,refs, by = "HostCorrectedName")
 Measure PSR from gmpd
 
 ```{r gmpd psr}
-gmpd_PSR <- gmpd %>% filter(ParType %in% c("Helminth", "Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+gmpd_PSR <- gmpd %>% 
+  filter(ParType %in% c("Arthropod", "Helminth", "Virus", "Bacteria", "Protozoa")) %>% #no fungus or prion
+  dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
   distinct() %>% 
   group_by(HostCorrectedName) %>% 
   summarize(psr=n())
 gmpd_PSR %<>% inner_join(., gmpd_dummy_vars)
-panth %<>% mutate(HostCorrectedName = MSW_Binomial)
+#panth %<>% mutate(HostCorrectedName = MSW_Binomial)
 
 ```
 
@@ -80,6 +81,81 @@ gmpd_panth %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
 gmpd_panth %<>% mutate(island_endemicity = as.factor(island_endemicity))
 # gmpd_panth %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 ```
+
+
+
+# Add column for transmission mode
+```{r}
+gmpd_mode <- gmpd_traits %>% mutate(mode = 
+                           ifelse(close == TRUE | nonclose == TRUE,
+                                  "direct",
+                                  "indirect")) %>%
+  filter(!is.na(mode)) #remove parasites without mode data
+
+gmpd_mode %<>% rename(para=ParasiteCorrectedName) %>% dplyr::select(para, mode)
+```
+
+# Add column for host specificity
+```{r}
+load(file=here("data", "GMPD", "get_nri.Rda"))
+nri %<>% rownames_to_column(., var = "para")
+
+nri %<>% 
+  filter(!is.na(mpd.obs.z)) %>%
+  mutate(spec_bin = ifelse(
+    mpd.obs.z<median(mpd.obs.z), #class determined above or below median
+    "specialist",
+    "generalist"
+  ))
+
+tabyl(nri$spec_bin)
+
+nri %<>% dplyr::select(para, spec_bin)
+```
+
+
+# Add column for prevalence
+```{r}
+gmpd_prev <- gmpd %>% 
+  dplyr::select(ParasiteCorrectedName, Prevalence) %>%
+  filter(!is.na(Prevalence)) %>%
+  group_by(ParasiteCorrectedName) %>%
+  summarize(Prevalence=mean(Prevalence)) %>% #get average prevalence
+  mutate(prev_bin = ifelse(
+    Prevalence > median(Prevalence), #above or below median
+    "high_prevalence",
+    "low_prevalence"
+  ))
+
+tabyl(gmpd_prev$prev_bin)
+
+gmpd_prev %<>% rename(para = ParasiteCorrectedName) %>% dplyr::select(para, prev_bin)
+```
+
+
+
+# Add column for intensity
+```{r}
+gmpd_int <- gmpd %>%
+  dplyr::select(ParasiteCorrectedName, Intensity) %>%
+  mutate(Intensity = as.numeric(Intensity)) %>% #some intensity measures included characters to indicate exponent or range. these are removed for now
+  filter(!is.na(Intensity)) %>%
+  filter(Intensity>0) %>% #some intensity measures were 0. these were removed
+  group_by(ParasiteCorrectedName) %>%
+  summarize(Intensity = mean(Intensity)) %>% #get average intensity
+  mutate(int_bin = ifelse(
+    Intensity > median(Intensity), #above or below median
+    "high_intensity",
+    "low_intensity"
+  ))
+
+tabyl(gmpd_int$int_bin)
+
+gmpd_int %<>% rename(para = ParasiteCorrectedName) %>% dplyr::select(para, int_bin)
+```
+
+
+
 
 
 
@@ -217,6 +293,8 @@ gmpd_panth_proto %<>% filter(iucn2020_binomial %in% intersect_hosts)
 gmpd_panth_macro %<>% filter(iucn2020_binomial %in% intersect_hosts)
 gmpd_panth_micro %<>% filter(iucn2020_binomial %in% intersect_hosts)
 ```
+
+
 
 
 ```{r}
@@ -373,8 +451,10 @@ summary(brt5_elith_bact)
 summary(brt6_elith_proto)
 summary(brt7_elith_macro)
 summary(brt8_elith_micro)
+```
 
 
+```{r, eval=F}
 saveRDS(brt1_elith_full, file = here("processed_data/brt_results/full_elith.rds"))
 saveRDS(brt2_elith_helm, file = here("processed_data/brt_results/helm_elith.rds"))
 saveRDS(brt3_elith_virus, file = here("processed_data/brt_results/virus_elith.rds"))
