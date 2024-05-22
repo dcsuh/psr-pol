@@ -508,6 +508,27 @@ brt_low_int <- gbm.step(data = low_int_train, gbm.x = 2:ncol(low_int_train), gbm
 
 
 ```{r}
+saveRDS(brt_macro, file = here("processed_data", "brt_results" ,"macro.rds"))
+saveRDS(brt_micro, file = here("processed_data", "brt_results" ,"micro.rds"))
+
+saveRDS(brt_direct, file = here("processed_data", "brt_results" ,"direct.rds"))
+saveRDS(brt_indirect, file = here("processed_data", "brt_results" ,"indirect.rds"))
+
+saveRDS(brt_specialist, file = here("processed_data", "brt_results" ,"specialist.rds"))
+saveRDS(brt_generalist, file = here("processed_data", "brt_results" ,"generalist.rds"))
+
+saveRDS(brt_high_prev, file = here("processed_data", "brt_results" ,"high_prev.rds"))
+saveRDS(brt_low_prev, file = here("processed_data", "brt_results" ,"low_prev.rds"))
+
+saveRDS(brt_high_int, file = here("processed_data", "brt_results" ,"high_int.rds"))
+saveRDS(brt_low_int, file = here("processed_data", "brt_results" ,"low_int.rds"))
+```
+
+
+
+
+
+```{r}
 summary(brt_macro)
 summary(brt_micro)
 ```
