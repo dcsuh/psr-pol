@@ -22,13 +22,14 @@ library(caret)
 library(gbm)
 library(VennDiagram)
 
-#source(here("previous work", "elith_tutorial", "brt.functions.R"))
+source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
 Read in data. To start, we are focusing on gmpd and pantheria
 
 ```{r read}
 gmpd <- read_csv(here("data/GMPD_main.csv"))
+gmpd_traits <- read_csv(here("data", "GMPD", "GMPD_parasite_traits.csv"))
 #panth <- read_csv(here("data/panth_subset.csv"))
 refs <- read_csv(here("data/google_refs.csv"))
 
@@ -67,7 +68,7 @@ gmpd_PSR %<>% inner_join(., gmpd_dummy_vars)
 
 ```{r}
 select_out <- function(df) {
-  dplyr::select(df, -c(HostCorrectedName, order:phylacine_binomial, adult_forearm_length_mm, biogeographical_realm))
+  dplyr::select(df, -c(HostCorrectedName, order:phylacine_binomial, adult_forearm_length_mm, biogeographical_realm, terrestrial_volant, 'terrestrial_non-volant'))
 }
 ```
 
@@ -92,7 +93,9 @@ gmpd_mode <- gmpd_traits %>% mutate(mode =
                                   "indirect")) %>%
   filter(!is.na(mode)) #remove parasites without mode data
 
-gmpd_mode %<>% rename(para=ParasiteCorrectedName) %>% dplyr::select(para, mode)
+gmpd_mode %<>% dplyr::select(ParasiteCorrectedName, mode)
+
+gmpd %<>% left_join(., gmpd_mode)
 ```
 
 # Add column for host specificity
@@ -110,7 +113,9 @@ nri %<>%
 
 tabyl(nri$spec_bin)
 
-nri %<>% dplyr::select(para, spec_bin)
+nri %<>% mutate(ParasiteCorrectedName = para) %>% dplyr::select(ParasiteCorrectedName, spec_bin)
+
+gmpd %<>% left_join(., nri)
 ```
 
 
@@ -129,7 +134,9 @@ gmpd_prev <- gmpd %>%
 
 tabyl(gmpd_prev$prev_bin)
 
-gmpd_prev %<>% rename(para = ParasiteCorrectedName) %>% dplyr::select(para, prev_bin)
+gmpd_prev %<>% dplyr::select(ParasiteCorrectedName, prev_bin)
+
+gmpd %<>% left_join(., gmpd_prev)
 ```
 
 
@@ -151,7 +158,9 @@ gmpd_int <- gmpd %>%
 
 tabyl(gmpd_int$int_bin)
 
-gmpd_int %<>% rename(para = ParasiteCorrectedName) %>% dplyr::select(para, int_bin)
+gmpd_int %<>% dplyr::select(ParasiteCorrectedName, int_bin)
+
+gmpd %<>% left_join(., gmpd_int)
 ```
 
 
@@ -176,64 +185,17 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 ```
 
 
-```{r gmpd initial model, warning = F}
+```{r gmpd initial model, warning = F, eval=F}
 
 brt1_elith_full <- gbm.step(data = gmpd_panth_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
-```
 
-```{r}
 summary(brt1_elith_full)
 ```
 
 
-```{r helminth}
-gmpd_helm <- gmpd %>% filter(ParType %in% c("Helminth")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-  distinct() %>% 
-  group_by(HostCorrectedName) %>% 
-  summarize(psr=n())
-
-gmpd_helm %<>% inner_join(., gmpd_dummy_vars)
-```
-
-```{r, arthropod}
-gmpd_arth <- gmpd %>% filter(ParType %in% c("Arthropod")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-  distinct() %>% 
-  group_by(HostCorrectedName) %>% 
-  summarize(psr=n())
-
-gmpd_arth %<>% inner_join(., gmpd_dummy_vars)
-```
-
-```{r virus}
-gmpd_virus <- gmpd %>% filter(ParType %in% c("Virus")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-  distinct() %>% 
-  group_by(HostCorrectedName) %>% 
-  summarize(psr=n())
-
-
-
-gmpd_virus %<>% inner_join(., gmpd_dummy_vars)
-```
-
-```{r bacteria}
-gmpd_bact <- gmpd %>% filter(ParType %in% c("Bacteria")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-  distinct() %>% 
-  group_by(HostCorrectedName) %>% 
-  summarize(psr=n())
-
-gmpd_bact %<>% inner_join(., gmpd_dummy_vars)
-```
-
-```{r protozoa}
-gmpd_proto <- gmpd %>% filter(ParType %in% c("Protozoa")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
-  distinct() %>% 
-  group_by(HostCorrectedName) %>% 
-  summarize(psr=n())
-
-gmpd_proto %<>% inner_join(., gmpd_dummy_vars)
-```
+#parasite type
 
 ```{r macro}
 gmpd_macro <- gmpd %>% filter(ParType %in% c("Helminth", "Arthropod")) %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
@@ -253,306 +215,358 @@ gmpd_micro <- gmpd %>% filter(ParType %in% c("Protozoa", "Virus", "Bacteria")) %
 gmpd_micro %<>% inner_join(., gmpd_dummy_vars)
 ```
 
+#transmission mode
+
+```{r}
+gmpd_direct <- gmpd %>% filter(mode == "direct") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_direct %<>% inner_join(., gmpd_dummy_vars)
+```
+
+```{r}
+gmpd_indirect <- gmpd %>% filter(mode == "indirect") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_indirect %<>% inner_join(., gmpd_dummy_vars)
+```
+
+#specialism
+
+```{r}
+gmpd_specialist <- gmpd %>% filter(spec_bin == "specialist") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_specialist %<>% inner_join(., gmpd_dummy_vars)
+```
+
+```{r}
+gmpd_generalist <- gmpd %>% filter(spec_bin == "generalist") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_generalist %<>% inner_join(., gmpd_dummy_vars)
+```
+
+
+#prevalence
+
+```{r}
+gmpd_low_prev <- gmpd %>% filter(prev_bin == "low_prevalence") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_low_prev %<>% inner_join(., gmpd_dummy_vars)
+```
+
+```{r}
+gmpd_high_prev <- gmpd %>% filter(prev_bin == "high_prevalence") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_high_prev %<>% inner_join(., gmpd_dummy_vars)
+```
+
+
+#intensity
+
+```{r}
+gmpd_low_int <- gmpd %>% filter(int_bin == "high_intensity") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_low_int %<>% inner_join(., gmpd_dummy_vars)
+```
+
+```{r}
+gmpd_high_int <- gmpd %>% filter(int_bin == "low_intensity") %>% dplyr::select(HostCorrectedName,ParasiteCorrectedName) %>% 
+  distinct() %>% 
+  group_by(HostCorrectedName) %>% 
+  summarize(psr=n())
+
+gmpd_high_int %<>% inner_join(., gmpd_dummy_vars)
+```
+
+
+
+
+
+```{r}
+join_name <- function(df){
+  as.data.frame(df %>% inner_join(combine, by="HostCorrectedName"))
+}
+```
+
 
 ```{r join name}
-gmpd_panth_helm <- as.data.frame(gmpd_helm %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_virus <- as.data.frame(gmpd_virus %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_arth <- as.data.frame(gmpd_arth %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_bact <- as.data.frame(gmpd_bact %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_proto <- as.data.frame(gmpd_proto %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_macro <- as.data.frame(gmpd_macro %>% inner_join(combine, by="HostCorrectedName"))
-gmpd_panth_micro <- as.data.frame(gmpd_micro %>% inner_join(combine, by="HostCorrectedName"))
+gmpd_panth_macro <- join_name(gmpd_macro)
+gmpd_panth_micro <- join_name(gmpd_micro)
+
+gmpd_panth_direct <- join_name(gmpd_direct)
+gmpd_panth_indirect <- join_name(gmpd_indirect)
+
+gmpd_panth_specialist <- join_name(gmpd_specialist)
+gmpd_panth_generalist <- join_name(gmpd_generalist)
+
+gmpd_panth_high_prev <- join_name(gmpd_high_prev)
+gmpd_panth_low_prev <- join_name(gmpd_low_prev)
+
+gmpd_panth_high_int <- join_name(gmpd_high_int)
+gmpd_panth_low_int <- join_name(gmpd_low_int)
 ```
 
 Use only hosts that overlap
 ```{r}
-gmpd_panth_helm_hosts <- gmpd_panth_helm$iucn2020_binomial #get all host species from macro database
-gmpd_panth_virus_hosts <- gmpd_panth_virus$iucn2020_binomial #get remaining host species from micro database
-gmpd_panth_arth_hosts <- gmpd_panth_arth$iucn2020_binomial
-gmpd_panth_bact_hosts <- gmpd_panth_bact$iucn2020_binomial
-gmpd_panth_proto_hosts <- gmpd_panth_proto$iucn2020_binomial
-
-
-# venn.diagram(x = list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts),
-#              category.names = c("helminth", "virus", "arthropod", "bacteria", "protozoa"),
-#              filename = here("figures/hosts_overlap.png"),
-#              output=T,
-#              margin = 0.1)
-
-
-intersect_hosts <- Reduce(intersect, list(gmpd_panth_helm_hosts, gmpd_panth_virus_hosts, gmpd_panth_arth_hosts, gmpd_panth_bact_hosts, gmpd_panth_proto_hosts))
-
-#saveRDS(intersect_hosts, here("data/hosts_intersect"))
-
-gmpd_panth_helm %<>% filter(iucn2020_binomial %in% intersect_hosts)
-gmpd_panth_virus %<>% filter(iucn2020_binomial %in% intersect_hosts)
-gmpd_panth_arth %<>% filter(iucn2020_binomial %in% intersect_hosts)
-gmpd_panth_bact %<>% filter(iucn2020_binomial %in% intersect_hosts)
-gmpd_panth_proto %<>% filter(iucn2020_binomial %in% intersect_hosts)
-
-gmpd_panth_macro %<>% filter(iucn2020_binomial %in% intersect_hosts)
-gmpd_panth_micro %<>% filter(iucn2020_binomial %in% intersect_hosts)
-```
-
-
-
-
-```{r}
-# host_names <- tibble(species = gmpd_panth_helm$HostCorrectedName)
-# write_csv(host_names, file = here("data/host_names.csv"))
+hosts_overlap <- function(df_a, df_b){
+  hosts_a <- df_a$HostCorrectedName
+  hosts_b <- df_b$HostCorrectedName
+  
+  Reduce(intersect, list(hosts_a, hosts_b))
+}
 ```
 
 ```{r}
-train <- sample(1:nrow(gmpd_panth_helm), nrow(gmpd_panth_helm) * 0.8)
-test <- gmpd_panth_helm %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
-test <- as.integer(test$row_num)
+partype_intersect <- hosts_overlap(gmpd_panth_macro, gmpd_panth_micro)
+mode_intersect <- hosts_overlap(gmpd_panth_direct, gmpd_panth_indirect)
+spec_intersect <- hosts_overlap(gmpd_panth_specialist, gmpd_panth_generalist)
+prev_intersect <- hosts_overlap(gmpd_panth_low_prev, gmpd_panth_high_prev)
+int_intersect <- hosts_overlap(gmpd_panth_low_int, gmpd_panth_high_int)
+```
+
+```{r}
+gmpd_panth_macro %<>% filter(HostCorrectedName %in% partype_intersect)
+gmpd_panth_micro %<>% filter(HostCorrectedName %in% partype_intersect)
+
+gmpd_panth_direct %<>% filter(HostCorrectedName %in% mode_intersect)
+gmpd_panth_indirect %<>% filter(HostCorrectedName %in% mode_intersect)
+
+gmpd_panth_specialist %<>% filter(HostCorrectedName %in% spec_intersect)
+gmpd_panth_generalist %<>% filter(HostCorrectedName %in% spec_intersect)
+
+gmpd_panth_low_prev %<>% filter(HostCorrectedName %in% prev_intersect)
+gmpd_panth_high_prev %<>% filter(HostCorrectedName %in% prev_intersect)
+
+gmpd_panth_low_int %<>% filter(HostCorrectedName %in% int_intersect)
+gmpd_panth_high_int %<>% filter(HostCorrectedName %in% int_intersect)
 ```
 
 
 ```{r}
-gmpd_panth_helm %<>% select_out()
+prep_data <- function(df_a){
+  df_a %<>% select_out()
 
-gmpd_panth_helm %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_helm %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_helm %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
-
-gmpd_panth_helm_train <- gmpd_panth_helm[train,]
-gmpd_panth_helm_test <- gmpd_panth_helm[test,]
+  df_a %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
+  df_a %<>% mutate(island_endemicity = as.factor(island_endemicity))
+  # df_a %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+  df_a
+}
 ```
+
 
 ```{r}
-gmpd_panth_arth %<>% select_out()
+gmpd_panth_macro %<>% prep_data()
+gmpd_panth_micro %<>% prep_data()
 
-gmpd_panth_arth %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_arth %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_arth %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+gmpd_panth_direct %<>% prep_data()
+gmpd_panth_indirect %<>% prep_data()
 
-gmpd_panth_arth_train <- gmpd_panth_arth[train,]
-gmpd_panth_arth_test <- gmpd_panth_arth[test,]
+gmpd_panth_specialist %<>% prep_data()
+gmpd_panth_generalist %<>% prep_data()
+
+gmpd_panth_high_prev %<>% prep_data()
+gmpd_panth_low_prev %<>% prep_data()
+
+gmpd_panth_high_int %<>% prep_data()
+gmpd_panth_low_int %<>% prep_data()
 ```
+
+
 
 ```{r}
-gmpd_panth_virus %<>% select_out()
+train_test <- function(df_a){
+  train <- sample(1:nrow(df_a), nrow(df_a) * 0.8)
+  test <- df_a %>% mutate(row_num = rownames(.)) %>% filter(!row_num %in% train) %>% dplyr::select(row_num)
+  test <- as.integer(test$row_num)
+  
 
-gmpd_panth_virus %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_virus %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_virus %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
-
-gmpd_panth_virus_train <- gmpd_panth_virus[train,]
-gmpd_panth_virus_test <- gmpd_panth_virus[test,]
+  df_train <- df_a[train,]
+  df_test <- df_a[test,]
+  
+  list(train, test)
+}
 ```
+
 
 ```{r}
-gmpd_panth_bact %<>% select_out()
 
-gmpd_panth_bact %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_bact %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_bact %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
+type_train <- train_test(gmpd_panth_macro)
+macro_train <- gmpd_panth_macro[type_train[[1]],]
+macro_test <- gmpd_panth_macro[type_train[[2]],]
+micro_train <- gmpd_panth_micro[type_train[[1]],]
+micro_test <- gmpd_panth_micro[type_train[[2]],]
 
-gmpd_panth_bact_train <- gmpd_panth_bact[train,]
-gmpd_panth_bact_test <- gmpd_panth_bact[test,]
+mode_train <- train_test(gmpd_panth_direct)
+direct_train <- gmpd_panth_direct[mode_train[[1]],]
+direct_test <- gmpd_panth_direct[mode_train[[2]],]
+indirect_train <- gmpd_panth_indirect[mode_train[[1]],]
+indirect_test <- gmpd_panth_indirect[mode_train[[2]],]
+
+spec_train <- train_test(gmpd_panth_specialist)
+specialist_train <- gmpd_panth_specialist[spec_train[[1]],]
+specialist_test <- gmpd_panth_specialist[spec_train[[2]],]
+generalist_train <- gmpd_panth_generalist[spec_train[[1]],]
+generalist_test <- gmpd_panth_generalist[spec_train[[2]],]
+
+prev_train <- train_test(gmpd_panth_high_prev)
+high_prev_train <- gmpd_panth_high_prev[prev_train[[1]],]
+high_prev_test <- gmpd_panth_high_prev[prev_train[[2]],]
+low_prev_train <- gmpd_panth_low_prev[prev_train[[1]],]
+low_prev_test <- gmpd_panth_low_prev[prev_train[[2]],]
+
+int_train <- train_test(gmpd_panth_high_int)
+high_int_train <- gmpd_panth_high_int[int_train[[1]],]
+high_int_test <- gmpd_panth_high_int[int_train[[2]],]
+low_int_train <- gmpd_panth_low_int[int_train[[1]],]
+low_int_test <- gmpd_panth_low_int[int_train[[2]],]
 ```
 
-```{r}
-gmpd_panth_proto %<>% select_out()
 
-gmpd_panth_proto %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_proto %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_proto %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
 
-gmpd_panth_proto_train <- gmpd_panth_proto[train,]
-gmpd_panth_proto_test <- gmpd_panth_proto[test,]
-```
-
-```{r}
-gmpd_panth_macro %<>% select_out()
-
-gmpd_panth_macro %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_macro %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_macro %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
-
-gmpd_panth_macro_train <- gmpd_panth_macro[train,]
-gmpd_panth_macro_test <- gmpd_panth_macro[test,]
-```
-
-```{r}
-gmpd_panth_micro %<>% select_out()
-
-gmpd_panth_micro %<>% mutate(foraging_stratum = as.factor(foraging_stratum))
-gmpd_panth_micro %<>% mutate(island_endemicity = as.factor(island_endemicity))
-# gmpd_panth_micro %<>% mutate(biogeographical_realm = as.factor(biogeographical_realm))
-
-gmpd_panth_micro_train <- gmpd_panth_micro[train,]
-gmpd_panth_micro_test <- gmpd_panth_micro[test,]
-```
 
 Elith method
-```{r helminth model, warning=F}
-# brt2_elith_macro <- gbm.step(data = gmpd_panth_macro_train, gbm.x = 2:47, gbm.y= 1,
-#                  family = "poisson", tree.complexity = 5,
-#                  learning.rate = 0.001, bag.fraction = 0.5)
-# 
-# brt3_elith_micro <- gbm.step(data = gmpd_panth_micro_train, gbm.x = 2:47, gbm.y= 1,
-#                  family = "poisson", tree.complexity = 5,
-#                  learning.rate = 0.001, bag.fraction = 0.5)
-
-brt2_elith_helm <- gbm.step(data = gmpd_panth_helm_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
-                 family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
-```
 
 
-```{r virus model, warning=F}
-brt3_elith_virus <- gbm.step(data = gmpd_panth_virus_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
-                 family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
-```
-
-
-```{r arthropod model, warning=F}
-brt4_elith_arth <- gbm.step(data = gmpd_panth_arth_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
-                 family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.002, bag.fraction = 0.5)
-```
-
-
-```{r bacteria model, warning=F}
-brt5_elith_bact <- gbm.step(data = gmpd_panth_bact_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
-                 family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
-```
-
-
-```{r protozoa model, warning=F}
-brt6_elith_proto <- gbm.step(data = gmpd_panth_proto_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
+```{r}
+brt_macro <- gbm.step(data = macro_train, gbm.x = 2:ncol(macro_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 ```{r}
-brt7_elith_macro <- gbm.step(data = gmpd_panth_macro_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
+brt_micro <- gbm.step(data = micro_train, gbm.x = 2:ncol(micro_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_direct <- gbm.step(data = direct_train, gbm.x = 2:ncol(direct_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_indirect <- gbm.step(data = indirect_train, gbm.x = 2:ncol(indirect_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_specialist <- gbm.step(data = specialist_train, gbm.x = 2:ncol(specialist_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_generalist <-gbm.step(data = generalist_train, gbm.x = 2:ncol(generalist_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_high_prev <- gbm.step(data = high_prev_train, gbm.x = 2:ncol(high_prev_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_low_prev <- gbm.step(data = low_prev_train, gbm.x = 2:ncol(low_prev_train), gbm.y= 1,
+                 family = "poisson", tree.complexity = 5,
+                 learning.rate = 0.003, bag.fraction = 0.5)
+```
+
+```{r}
+brt_high_int <- gbm.step(data = high_int_train, gbm.x = 2:ncol(high_int_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 ```{r}
-brt8_elith_micro <- gbm.step(data = gmpd_panth_micro_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
+brt_low_int <- gbm.step(data = low_int_train, gbm.x = 2:ncol(low_int_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
                  learning.rate = 0.004, bag.fraction = 0.5)
 ```
 
 
 ```{r}
-summary(brt1_elith_full)
-summary(brt2_elith_helm)
-summary(brt3_elith_virus)
-summary(brt4_elith_arth)
-summary(brt5_elith_bact)
-summary(brt6_elith_proto)
-summary(brt7_elith_macro)
-summary(brt8_elith_micro)
-```
-
-
-```{r, eval=F}
-saveRDS(brt1_elith_full, file = here("processed_data/brt_results/full_elith.rds"))
-saveRDS(brt2_elith_helm, file = here("processed_data/brt_results/helm_elith.rds"))
-saveRDS(brt3_elith_virus, file = here("processed_data/brt_results/virus_elith.rds"))
-saveRDS(brt4_elith_arth, file = here("processed_data/brt_results/arth_elith.rds"))
-saveRDS(brt5_elith_bact, file = here("processed_data/brt_results/bact_elith.rds"))
-saveRDS(brt6_elith_proto, file = here("processed_data/brt_results/proto_elith.rds"))
-saveRDS(brt7_elith_macro, file = here("processed_data/brt_results/macro_elith.rds"))
-saveRDS(brt8_elith_micro, file = here("processed_data/brt_results/micro_elith.rds"))
-
-```
-
-
-
-```{r gmpd pdp 6}
-gbm.plot(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
-gbm.plot(brt2_elith_helm, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "helminth")
-gbm.plot(brt3_elith_virus, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "virus")
-gbm.plot(brt4_elith_arth, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "arthropod")
-gbm.plot(brt5_elith_bact, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "bacteria")
-gbm.plot(brt6_elith_proto, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "protozoa")
-gbm.plot(brt7_elith_macro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "macroparasites")
-gbm.plot(brt8_elith_micro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "microparasites")
+summary(brt_macro)
+summary(brt_micro)
 ```
 
 ```{r}
-plot.gbm(brt1_elith_full, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "full")
-
-```
-
-```{r gmpd pdp2}
-brt1_names <- brt1_elith_full$var.names
-brt2_names <- brt2_elith_helm$var.names
-brt3_names <- brt3_elith_virus$var.names
-brt4_names <- brt4_elith_arth$var.names
-brt5_names <- brt5_elith_bact$var.names
-brt6_names <- brt6_elith_proto$var.names
-
-var_name <- c("max_longevity_d")
-
-brt1_long_plot_no <- which(brt1_names %in% var_name)
-brt2_long_plot_no <- which(brt2_names %in% var_name)
-brt3_long_plot_no <- which(brt3_names %in% var_name)
-brt4_long_plot_no <- which(brt4_names %in% var_name)
-brt5_long_plot_no <- which(brt5_names %in% var_name)
-brt6_long_plot_no <- which(brt6_names %in% var_name)
-
-gbm.plot(brt1_elith_full, variable.no = brt1_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "full")
-gbm.plot(brt2_elith_helm, variable.no = brt2_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "helm")
-gbm.plot(brt3_elith_virus, variable.no = brt3_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "virus")
-gbm.plot(brt4_elith_arth, variable.no = brt4_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "arth")
-gbm.plot(brt5_elith_bact, variable.no = brt5_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "bact")
-gbm.plot(brt6_elith_proto, variable.no = brt6_long_plot_no, plot.layout=c(1, 1), write.title = FALSE, main = "proto")
+summary(brt_direct)
+summary(brt_indirect)
 ```
 
 ```{r}
-plot.gbm(brt1_elith_full, n.plots=6, i.var = brt1_long_plot_no, main = "full", type = "response")
-plot.gbm(brt2_elith_helm, n.plots=6, i.var = brt2_long_plot_no, main = "helminth", type = "response")
-plot.gbm(brt3_elith_virus, n.plots=6, i.var = brt3_long_plot_no, main = "virus", type = "response")
-plot.gbm(brt4_elith_arth, n.plots=6, i.var = brt4_long_plot_no, main = "arthropod", type = "response")
-plot.gbm(brt5_elith_bact, n.plots=6, i.var = brt5_long_plot_no, main = "bacteria", type = "response")
-plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozoa", type = "response")
-```
-
-
-
-
-
-
-
-
-
-
-
-Becker and Han Method
-```{r}
-brt1_other_full <- gbm(psr ~ ., data = gmpd_panth_train,
-                 distribution = "poisson", n.trees = brt1_elith_full$n.trees,
-                 interaction.depth = 5, shrinkage = 0.004)
-
-brt2_other_helm <- gbm(psr ~ ., data = gmpd_panth_helm_train,
-                 distribution = "poisson", n.trees = brt2_elith_helm$n.trees,
-                 interaction.depth = 5, shrinkage = 0.001)
-
-brt3_other_virus <- gbm(psr ~ ., data = gmpd_panth_virus_train,
-                 distribution = "poisson", n.trees = brt3_elith_virus$n.trees,
-                 interaction.depth = 5, shrinkage = 0.001)
+summary(brt_specialist)
+summary(brt_generalist)
 ```
 
 ```{r}
-summary(brt1_other_full)
-summary(brt2_other_helm)
-summary(brt3_other_virus)
+summary(brt_high_prev)
+summary(brt_low_prev)
 ```
+
+```{r}
+summary(brt_high_int)
+summary(brt_low_int)
+```
+
+
+
+
+
+```{r}
+gbm.plot(brt_macro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "macroparasites")
+gbm.plot(brt_micro, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "microparasites")
+```
+
+```{r}
+gbm.plot(brt_direct, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "direct")
+gbm.plot(brt_indirect, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "indirect")
+```
+
+```{r}
+gbm.plot(brt_specialist, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "generalist")
+gbm.plot(brt_generalist, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "specialist")
+```
+
+```{r}
+gbm.plot(brt_high_prev, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "high_prevalence")
+gbm.plot(brt_low_prev, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "low_prevalence")
+```
+
+```{r}
+gbm.plot(brt_high_int, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "high_intensity")
+gbm.plot(brt_low_int, n.plots=6, plot.layout=c(2, 3), write.title = FALSE, common.scale = T, main = "low_intensity")
+```
+
+
 
 Function for mean squared error and root mean square deviation
 ```{r}
 get_mse <- function(model, test) {
-  pred <- predict(model, newdata = test, n.trees = model$n.trees)
+  pred <- gbm.predict.grids(model, test, want.grids=F, sp.name = "preds")
   MSE <- mean((pred - test$psr)^2)
   RMSD <- sqrt(mean((pred-test$psr)^2))
   name <- print(substitute(model))
@@ -563,51 +577,43 @@ get_mse <- function(model, test) {
 
 
 ```{r}
-get_mse(brt1_elith_full, gmpd_panth_test)
-get_mse(brt2_elith_helm, gmpd_panth_helm_test)
-get_mse(brt3_elith_virus, gmpd_panth_virus_test)
-get_mse(brt4_elith_arth, gmpd_panth_arth_test)
-get_mse(brt5_elith_bact, gmpd_panth_bact_test)
-get_mse(brt6_elith_proto, gmpd_panth_proto_test)
-get_mse(brt7_elith_macro, gmpd_panth_macro_test)
-get_mse(brt8_elith_micro, gmpd_panth_micro_test)
+get_mse(brt_macro, macro_test)
+get_mse(brt_micro, micro_test)
+```
+```{r}
+gbm.plot.fits(brt_macro)
+
+macro_predict <- gbm.predict.grids(brt_macro, macro_test, want.grids=F, sp.name="preds")
+```
+
+```{r}
+macro_test$psr
+macro_predict
+dat <- as.data.frame(cbind(macro_predict, macro_test$psr))
+ggplot(dat, aes(x=V2, y=macro_predict)) + geom_point()
 ```
 
 
 
-Prediction. Mean Squared Error and Root Mean Square Deviation
 ```{r}
-brt1_full_test_pred <- predict(brt1_elith_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
-mean((brt1_full_test_pred-gmpd_panth_test$psr)^2)
-sqrt(mean((brt1_full_test_pred-gmpd_panth_test$psr)^2))
+get_mse(brt_direct, direct_test)
+get_mse(brt_indirect, indirect_test)
 ```
 
-```{r}
-brt1_full_test_pred_other <- predict(brt1_other_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
-mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2)
-sqrt(mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2))
-```
 
 ```{r}
-brt2_helm_test_pred <- predict(brt2_elith_helm, newdata = gmpd_panth_helm_test, n.trees = brt2_elith_helm$n.trees)
-mean((brt2_helm_test_pred-gmpd_panth_helm_test$psr)^2)
-sqrt(mean((brt2_helm_test_pred-gmpd_panth_helm_test$psr)^2))
+get_mse(brt_specialist, specialist_test)
+get_mse(brt_generalist, generalist_test)
 ```
 
-```{r}
-# brt2_macro_test_pred_other <- predict(brt2_other_macro, newdata = gmpd_panth_macro_test, n.trees = brt2_other_macro$n.trees)
-# mean((brt2_macro_test_pred_other-gmpd_panth_macro_test$psr)^2)
-# sqrt(mean((brt2_macro_test_pred_other-gmpd_panth_macro_test$psr)^2))
-```
 
 ```{r}
-brt3_virus_test_pred <- predict(brt3_elith_virus, newdata = gmpd_panth_virus_test, n.trees = brt3_elith_virus$n.trees)
-mean((brt3_virus_test_pred-gmpd_panth_virus_test$psr)^2)
-sqrt(mean((brt3_virus_test_pred-gmpd_panth_virus_test$psr)^2))
+get_mse(brt_high_prev, high_prev_test)
+get_mse(brt_low_prev, low_prev_test)
 ```
 
+
 ```{r}
-# brt3_micro_test_pred_other <- predict(brt3_other_micro, newdata = gmpd_panth_micro_test, n.trees = brt3_other_micro$n.trees)
-# mean((brt3_micro_test_pred_other-gmpd_panth_micro_test$psr)^2)
-# sqrt(mean((brt3_micro_test_pred_other-gmpd_panth_micro_test$psr)^2))
+get_mse(brt_high_int, high_int_test)
+get_mse(brt_low_int, low_int_test)
 ```
