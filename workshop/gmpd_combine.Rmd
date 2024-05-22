@@ -98,7 +98,7 @@ gmpd_panth_test <- as.data.frame(gmpd_panth_test)
 
 brt1_elith_full <- gbm.step(data = gmpd_panth_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
+                 learning.rate = 0.003, bag.fraction = 0.5)
 ```
 
 ```{r}
@@ -286,14 +286,14 @@ Elith method
 
 brt2_elith_helm <- gbm.step(data = gmpd_panth_helm_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
+                 learning.rate = 0.003, bag.fraction = 0.5)
 ```
 
 
 ```{r virus model, warning=F}
 brt3_elith_virus <- gbm.step(data = gmpd_panth_virus_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
+                 learning.rate = 0.001, bag.fraction = 0.5)
 ```
 
 
@@ -320,7 +320,7 @@ brt6_elith_proto <- gbm.step(data = gmpd_panth_proto_train, gbm.x = 2:ncol(gmpd_
 ```{r}
 brt7_elith_macro <- gbm.step(data = gmpd_panth_macro_train, gbm.x = 2:ncol(gmpd_panth_train), gbm.y= 1,
                  family = "poisson", tree.complexity = 5,
-                 learning.rate = 0.004, bag.fraction = 0.5)
+                 learning.rate = 0.003, bag.fraction = 0.5)
 ```
 
 ```{r}
