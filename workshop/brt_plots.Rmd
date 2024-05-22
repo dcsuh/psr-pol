@@ -197,8 +197,35 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 ```
 
 
-```{r plot by type}
+Which variables consistently rank in the top 15 among parasite types?
+```{r}
 brt_ri %<>% mutate(top_fifteen = ifelse(ranking < 16, 1, 0))
+
+top15 <- brt_ri %>% filter(ranking<16)
+brt2_top15_helm <- top15 %>% filter(par_type == "helminth")
+brt2_top15_helm <- brt2_top15_helm$var
+brt3_top15_virus <- top15 %>% filter(par_type == "virus")
+brt3_top15_virus <- brt3_top15_virus$var
+brt4_top15_arth <- top15 %>% filter(par_type == "arthropod")
+brt4_top15_arth <- brt4_top15_arth$var
+brt5_top15_bact <- top15 %>% filter(par_type == "bacteria")
+brt5_top15_bact <- brt5_top15_bact$var
+brt6_top15_proto <- top15 %>% filter(par_type == "protozoa")
+brt6_top15_proto <- brt6_top15_proto$var
+
+
+intersect_vars <- Reduce(intersect, 
+                          list(brt2_top15_helm, brt3_top15_virus, brt4_top15_arth, brt5_top15_bact, brt6_top15_proto))
+
+
+#top_vars <- brt_ri %>% filter(var %in% intersect_vars)
+
+brt_ri %<>% mutate(top_intersect = ifelse(var %in% intersect_vars, 1, 0))
+
+```
+
+
+```{r plot by type}
 
 
 subway_full <- brt_ri %>% filter(top_fifteen == T) %>%
@@ -219,10 +246,10 @@ subway_full <- brt_ri %>% filter(top_fifteen == T) %>%
 subway_intersect <- brt_ri %>% filter(top_fifteen == T) %>% 
   filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
   ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
-    geom_line(aes(color = var_type, alpha = top_intersect+0.2), size = 1) +
+  geom_line(aes(color = var_type, alpha = top_intersect+0.2), size = 1) +
     scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
 #    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
-    geom_point(aes(color = var_type, alpha = top_intersect+0.2), size = 10) +
+  geom_point(aes(color = var_type, alpha = top_intersect+0.2), size = 10) +
     scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
     labs(x = "Parasite Type", 
          y = "Ranking",
@@ -245,6 +272,7 @@ brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
     scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
     theme_minimal()
 ```
+
 which variables are top 5 for each parasite type?
 
 ```{r}
@@ -338,30 +366,7 @@ top_5_ri <- arth_top / helm_top | bact_top / virus_top / proto_top
 
 
 
-Which variables consistently rank in the top 15 among parasite types?
-```{r}
-top15 <- brt_ri %>% filter(ranking<16)
-brt2_top15_helm <- top15 %>% filter(par_type == "helminth")
-brt2_top15_helm <- brt2_top15_helm$var
-brt3_top15_virus <- top15 %>% filter(par_type == "virus")
-brt3_top15_virus <- brt3_top15_virus$var
-brt4_top15_arth <- top15 %>% filter(par_type == "arthropod")
-brt4_top15_arth <- brt4_top15_arth$var
-brt5_top15_bact <- top15 %>% filter(par_type == "bacteria")
-brt5_top15_bact <- brt5_top15_bact$var
-brt6_top15_proto <- top15 %>% filter(par_type == "protozoa")
-brt6_top15_proto <- brt6_top15_proto$var
 
-
-intersect_vars <- Reduce(intersect, 
-                          list(brt2_top15_helm, brt3_top15_virus, brt4_top15_arth, brt5_top15_bact, brt6_top15_proto))
-
-
-#top_vars <- brt_ri %>% filter(var %in% intersect_vars)
-
-brt_ri %<>% mutate(top_intersect = ifelse(var %in% intersect_vars, 1, 0))
-
-```
 
 ```{r}
 brt_ri %>% filter(top_intersect == T) %>% 
