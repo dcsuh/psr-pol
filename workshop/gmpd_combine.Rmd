@@ -22,7 +22,7 @@ library(caret)
 library(gbm)
 library(VennDiagram)
 
-#source(here("previous work", "elith_tutorial", "brt.functions.R"))
+source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
 Read in data. To start, we are focusing on gmpd and pantheria
@@ -472,7 +472,7 @@ summary(brt3_other_virus)
 Function for mean squared error and root mean square deviation
 ```{r}
 get_mse <- function(model, test) {
-  pred <- predict(model, newdata = test, n.trees = model$n.trees)
+  pred <- gbm.predict.grids(model, test, want.grids=F, sp.name = "preds")
   MSE <- mean((pred - test$psr)^2)
   RMSD <- sqrt(mean((pred-test$psr)^2))
   name <- print(substitute(model))
@@ -494,22 +494,141 @@ get_mse(brt8_elith_micro, gmpd_panth_micro_test)
 ```
 
 
+```{r}
+get_pred <- function(model, test){
+  gbm.predict.grids(model, test, want.grids=F, sp.name = "preds")
+}
+```
+
+```{r}
+full_pred <- get_pred(brt1_elith_full, gmpd_panth_test)
+helm_pred <- get_pred(brt2_elith_helm, gmpd_panth_helm_test)
+virus_pred <- get_pred(brt3_elith_virus, gmpd_panth_virus_test)
+arth_pred <- get_pred(brt4_elith_arth, gmpd_panth_arth_test)
+bact_pred <- get_pred(brt5_elith_bact, gmpd_panth_bact_test)
+proto_pred <- get_pred(brt6_elith_proto, gmpd_panth_proto_test)
+macro_pred <- get_pred(brt7_elith_macro, gmpd_panth_macro_test)
+micro_pred <- get_pred(brt8_elith_micro, gmpd_panth_micro_test)
+```
+
+
+
+
+```{r}
+full_test <- tibble(actual = gmpd_panth_test$psr,
+                    pred = gbm.predict.grids(brt1_elith_full, gmpd_panth_test, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_helm_test$psr
+model <- brt2_elith_helm
+test_data <- gmpd_panth_helm_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_virus_test$psr
+model <- brt3_elith_virus
+test_data <- gmpd_panth_virus_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_arth_test$psr
+model <- brt4_elith_arth
+test_data <- gmpd_panth_arth_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_bact_test$psr
+model <- brt5_elith_bact
+test_data <- gmpd_panth_bact_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_proto_test$psr
+model <- brt6_elith_proto
+test_data <- gmpd_panth_proto_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_macro_test$psr
+model <- brt7_elith_macro
+test_data <- gmpd_panth_macro_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
+
+```{r}
+test_psr <- gmpd_panth_micro_test$psr
+model <- brt8_elith_micro
+test_data <- gmpd_panth_micro_test
+
+full_test <- tibble(actual = test_psr,
+                    pred = gbm.predict.grids(model, test_data, want.grids=F, sp.name = "preds"))
+full_test %<>% mutate(diff = actual-pred)
+ggplot(full_test, aes(x=actual, y=pred)) + geom_point() + geom_abline(slope=1)
+ggplot(full_test, aes(x=actual, y=diff)) + geom_point() + geom_hline(yintercept=0)
+ggplot(full_test, aes(x=actual, y=abs(diff))) + geom_point() + geom_hline(yintercept=0)
+```
 
 Prediction. Mean Squared Error and Root Mean Square Deviation
 ```{r}
-brt1_full_test_pred <- predict(brt1_elith_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
+brt1_full_test_pred <- full_pred
 mean((brt1_full_test_pred-gmpd_panth_test$psr)^2)
 sqrt(mean((brt1_full_test_pred-gmpd_panth_test$psr)^2))
 ```
 
 ```{r}
-brt1_full_test_pred_other <- predict(brt1_other_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
-mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2)
-sqrt(mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2))
+# brt1_full_test_pred_other <- predict(brt1_other_full, newdata = gmpd_panth_test, n.trees = brt1_elith_full$n.trees)
+# mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2)
+# sqrt(mean((brt1_full_test_pred_other-gmpd_panth_test$psr)^2))
 ```
 
 ```{r}
-brt2_helm_test_pred <- predict(brt2_elith_helm, newdata = gmpd_panth_helm_test, n.trees = brt2_elith_helm$n.trees)
+brt2_helm_test_pred <- helm_pred
 mean((brt2_helm_test_pred-gmpd_panth_helm_test$psr)^2)
 sqrt(mean((brt2_helm_test_pred-gmpd_panth_helm_test$psr)^2))
 ```
@@ -521,7 +640,7 @@ sqrt(mean((brt2_helm_test_pred-gmpd_panth_helm_test$psr)^2))
 ```
 
 ```{r}
-brt3_virus_test_pred <- predict(brt3_elith_virus, newdata = gmpd_panth_virus_test, n.trees = brt3_elith_virus$n.trees)
+brt3_virus_test_pred <- virus_pred
 mean((brt3_virus_test_pred-gmpd_panth_virus_test$psr)^2)
 sqrt(mean((brt3_virus_test_pred-gmpd_panth_virus_test$psr)^2))
 ```

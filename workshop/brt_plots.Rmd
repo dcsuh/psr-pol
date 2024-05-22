@@ -199,42 +199,7 @@ ggplot(data = ., aes(x = par_type, y = ranking, group = var)) +
 ```
 
 
-```{r plot by type}
-brt_ri %<>% mutate(top_fifteen = ifelse(ranking < 16, 1, 0))
 
-
-subway_full <- brt_ri %>% filter(top_fifteen == T) %>%
-  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
-  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
-    geom_line(aes(color = var_type), size = 1) +
-    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
-#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
-    geom_point(aes(color = var_type), size = 10) +
-    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
-    labs(x = "Parasite Type", 
-         y = "Ranking",
-         shape = "Variable",
-         color = "Variable Type")+
-    theme_minimal() +
-  custom_color
-
-subway_intersect <- brt_ri %>% filter(top_fifteen == T) %>% 
-  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
-  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
-    geom_line(aes(color = var_type, alpha = top_intersect+0.2), size = 1) +
-    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
-#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
-    geom_point(aes(color = var_type, alpha = top_intersect+0.2), size = 10) +
-    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
-    labs(x = "Parasite Type", 
-         y = "Ranking",
-         shape = "Variable",
-         color = "Variable Type")+
-    theme_minimal() +
-  scale_alpha(guide = "none") +
-  custom_color
-
-```
 
 ```{r plot by macro micro}
 brt_ri %>% filter(par_type %in% c("macro", "micro")) %>%
@@ -362,6 +327,43 @@ intersect_vars <- Reduce(intersect,
 #top_vars <- brt_ri %>% filter(var %in% intersect_vars)
 
 brt_ri %<>% mutate(top_intersect = ifelse(var %in% intersect_vars, 1, 0))
+
+```
+
+```{r plot by type}
+brt_ri %<>% mutate(top_fifteen = ifelse(ranking < 16, 1, 0))
+
+
+subway_full <- brt_ri %>% filter(top_fifteen == T) %>%
+  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
+  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
+    geom_line(aes(color = var_type), size = 1) +
+    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
+#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
+    geom_point(aes(color = var_type), size = 10) +
+    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    labs(x = "Parasite Type", 
+         y = "Ranking",
+         shape = "Variable",
+         color = "Variable Type")+
+    theme_minimal() +
+  custom_color
+
+subway_intersect <- brt_ri %>% filter(top_fifteen == T) %>% 
+  filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
+  ggplot(data = ., aes(x = par_type, y = ranking, group = var, size = , shape = var)) +
+    geom_line(aes(color = var_type, alpha = top_intersect+0.2), size = 1) +
+    scale_shape_manual(values=1:nlevels(as.factor(brt_ri$var))) +
+#    scale_color_discrete(type = getOption("ggplot2.discrete.colour")) + 
+    geom_point(aes(color = var_type, alpha = top_intersect+0.2), size = 10) +
+    scale_y_reverse(breaks = 1:nrow(brt_ri)) + 
+    labs(x = "Parasite Type", 
+         y = "Ranking",
+         shape = "Variable",
+         color = "Variable Type")+
+    theme_minimal() +
+  scale_alpha(guide = "none") +
+  custom_color
 
 ```
 
@@ -664,6 +666,7 @@ area_pdp <- pdp_draw(brt2_area_plot,
                      pdp_y = )
 
 area_pdp
+density_pdp <- area_pdp
 
 ggsave(here("figures/pdp/gr_area.png"), area_pdp)
 
@@ -701,9 +704,19 @@ pop_dens_pdp <- pdp_draw(brt2_pop_dens_plot,
                      pdp_y = )
 
 pop_dens_pdp
+weaning_mass_pdp <- pop_dens_pdp
 
 ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp)
 
+```
+
+
+```{r}
+ref_count_pdp
+maturity_pdp #maturity_d
+range_pdp #home_rangekm2
+density_pdp #density_n_km2
+weaning_mass_pdp #weaning_mass_g
 ```
 
 
