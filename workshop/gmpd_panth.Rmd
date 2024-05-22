@@ -21,7 +21,7 @@ library(caret)
 library(gbm)
 library(VennDiagram)
 
-#source(here("previous work", "elith_tutorial", "brt.functions.R"))
+source(here("previous work", "elith_tutorial", "brt.functions.R"))
 ```
 
 Read in data. To start, we are focusing on gmpd and pantheria
@@ -396,7 +396,7 @@ plot.gbm(brt6_elith_proto, n.plots=6, i.var = brt6_long_plot_no, main = "protozo
 
 
 Becker and Han Method
-```{r}
+```{r, eval=F}
 brt1_other_full <- gbm(psr ~ ., data = gmpd_panth_train,
                  distribution = "poisson", n.trees = brt1_elith_full$n.trees,
                  interaction.depth = 5, shrinkage = 0.004)
@@ -410,7 +410,7 @@ brt3_other_virus <- gbm(psr ~ ., data = gmpd_panth_virus_train,
                  interaction.depth = 5, shrinkage = 0.001)
 ```
 
-```{r}
+```{r, eval=F}
 summary(brt1_other_full)
 summary(brt2_other_helm)
 summary(brt3_other_virus)
@@ -419,7 +419,7 @@ summary(brt3_other_virus)
 Function for mean squared error and root mean square deviation
 ```{r}
 get_mse <- function(model, test) {
-  pred <- predict(model, newdata = test, n.trees = model$n.trees)
+  pred <- gbm.predict.grids(model, new.dat = test)
   MSE <- mean((pred - test$psr)^2)
   RMSD <- sqrt(mean((pred-test$psr)^2))
   name <- print(substitute(model))
