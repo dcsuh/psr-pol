@@ -560,7 +560,7 @@ ref_count_pdp <- pdp_draw(brt2_ref_count_plot,
 
 ref_count_pdp
 
-ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp)
+ggsave(here("figures/pdp/ref_count.png"), ref_count_pdp, width = 4, height = 4)
 
 ```
 
@@ -595,7 +595,7 @@ maturity_pdp <- pdp_draw(brt2_maturity_plot,
 
 maturity_pdp
 
-ggsave(here("figures/pdp/sexual_maturity.png"), maturity_pdp)
+ggsave(here("figures/pdp/sexual_maturity.png"), maturity_pdp, width = 4, height = 4)
 
 ```
 
@@ -632,7 +632,7 @@ range_pdp <- pdp_draw(brt2_range_plot,
 
 range_pdp
 
-ggsave(here("figures/pdp/home_range.png"), range_pdp)
+ggsave(here("figures/pdp/home_range.png"), range_pdp, width = 4, height = 4)
 
 ```
 
@@ -667,7 +667,7 @@ area_pdp <- pdp_draw(brt2_area_plot,
 
 area_pdp
 
-ggsave(here("figures/pdp/gr_area.png"), area_pdp)
+ggsave(here("figures/pdp/gr_area.png"), area_pdp, width = 4, height = 4)
 
 ```
 
@@ -702,7 +702,7 @@ pop_dens_pdp <- pdp_draw(brt2_pop_dens_plot,
 
 pop_dens_pdp
 
-ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp)
+ggsave(here("figures/pdp/pop_dens.png"), pop_dens_pdp, width = 4, height = 4)
 
 ```
 
