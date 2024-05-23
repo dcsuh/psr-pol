@@ -381,7 +381,8 @@ brt_ri %>% filter(top_intersect == T) %>%
        y = "Relative Influence",
        fill = "Variable")
 
-brt_ri %>% filter(top_intersect == T) %>% 
+rel_imp_top <- brt_ri %>% 
+  filter(top_intersect == T) %>% 
   filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
   filter(var != "ref_count") %>%
   group_by(var) %>%
@@ -393,6 +394,8 @@ brt_ri %>% filter(top_intersect == T) %>%
        y = "Relative Influence",
        fill = "Parasite Type") 
 #+ theme(axis.text.y = element_blank())
+
+ggsave(here("figures", "top_rel_imp.png"), plot = rel_imp_top)
 
 ```
 
