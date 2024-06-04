@@ -589,8 +589,8 @@ maturity_pdp <- pdp_draw(brt2_maturity_plot,
                      brt6_maturity_plot,
                      hist_x = ,
                      hist_scale = ,
-                     pdp_x = -0.029,
-                     pdp_scale = 0.951,
+                     pdp_x = -0.076,
+                     pdp_scale = 0.955,
                      pdp_y = )
 
 maturity_pdp
@@ -626,8 +626,8 @@ range_pdp <- pdp_draw(brt2_range_plot,
                      brt6_range_plot,
                      hist_x = ,
                      hist_scale = ,
-                     pdp_x = -0.01,
-                     pdp_scale = 0.945,
+                     pdp_x = -0.0575,
+                     pdp_scale = 0.95,
                      pdp_y = )
 
 range_pdp
@@ -661,7 +661,7 @@ area_pdp <- pdp_draw(brt2_area_plot,
                      brt6_area_plot,
                      hist_x = ,
                      hist_scale = ,
-                     pdp_x = -0.01,
+                     pdp_x = -0.059,
                      pdp_scale = 0.95,
                      pdp_y = )
 
@@ -696,7 +696,7 @@ pop_dens_pdp <- pdp_draw(brt2_pop_dens_plot,
                      brt6_pop_dens_plot,
                      hist_x = ,
                      hist_scale = ,
-                     pdp_x = -0.01,
+                     pdp_x = -0.06,
                      pdp_scale = 0.95,
                      pdp_y = )
 
