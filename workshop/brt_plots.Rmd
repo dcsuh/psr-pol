@@ -399,6 +399,89 @@ ggsave(here("figures", "top_rel_imp.png"), plot = rel_imp_top)
 
 ```
 
+```{r}
+
+theme_set(theme_minimal() +
+            theme(title = element_text(size = 16),
+                  axis.text.x = element_text(size = 16),
+                  axis.text.y = element_text(size = 12)))
+
+
+maturity_relinf <- brt_ri %>% 
+  filter(var == "SexualMaturityAge_d") %>% 
+  filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  filter(var != "ref_count") %>%
+  group_by(var) %>%
+  ggplot(.,aes(x = var, y = rel.inf, fill = par_type)) + 
+  geom_bar(position = "dodge", stat = "identity") + 
+  custom_par_fill + 
+  coord_flip() +
+  ylim(0,17) + 
+  labs(x = " ",
+       y = "Relative Influence",
+       fill = "Parasite Type") + 
+  theme(legend.position = "none",
+        axis.text.y = element_text(angle=90, size = 18))
+
+
+human_relinf <- brt_ri %>% 
+  filter(var == "HuPopDen_Mean_n_km") %>% 
+  filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  filter(var != "ref_count") %>%
+  group_by(var) %>%
+  ggplot(.,aes(x = var, y = rel.inf, fill = par_type)) + 
+  geom_bar(position = "dodge", stat = "identity") + 
+  custom_par_fill + 
+  coord_flip()+
+  ylim(0,17) + 
+  labs(x = " ",
+       y = "Relative Influence",
+       fill = "Parasite Type") + 
+  theme(legend.position = "none",
+        axis.text.y = element_text(angle=90))
+
+
+homerange_relinf <- brt_ri %>% 
+  filter(var == "HomeRange_km") %>% 
+  filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  filter(var != "ref_count") %>%
+  group_by(var) %>%
+  ggplot(.,aes(x = var, y = rel.inf, fill = par_type)) + 
+  geom_bar(position = "dodge", stat = "identity") + 
+  custom_par_fill + 
+  coord_flip()+
+  ylim(0,17) + 
+  labs(x = " ",
+       y = "Relative Influence",
+       fill = "Parasite Type") + 
+  theme(legend.position = "none",
+        axis.text.y = element_text(angle=90))
+
+
+gr_area_relinf <- brt_ri %>% 
+  filter(var == "GR_Area_km") %>% 
+  filter(par_type %in% c("arthropod", "bacteria", "virus", "helminth", "protozoa")) %>%
+  filter(var != "ref_count") %>%
+  group_by(var) %>%
+  ggplot(.,aes(x = var, y = rel.inf, fill = par_type)) + 
+  geom_bar(position = "dodge", stat = "identity") + 
+  custom_par_fill + 
+  coord_flip()+
+  ylim(0,17) + 
+  labs(x = " ",
+       y = "Relative Influence",
+       fill = "Parasite Type") + 
+  theme(legend.position = "none",
+        axis.text.y = element_text(angle=90))
+
+ggsave(here("figures", "maturity_relinf.png"), plot = maturity_relinf, width = 8.19, height = 4.44)
+ggsave(here("figures", "human_relinf.png"), plot = human_relinf, width = 8.19, height = 4.44)
+ggsave(here("figures", "homerange_relinf.png"), plot = homerange_relinf, width = 8.19, height = 4.44)
+ggsave(here("figures", "gr_area_relinf.png"), plot = gr_area_relinf, width = 8.19, height = 4.44)
+
+```
+
+
 
 ```{r}
 top_15_subway <- brt_ri %>% filter(par_type %in% c("arthropod", "helminth", "bacteria", "protozoa", "virus")) %>%
